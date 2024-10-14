@@ -39,11 +39,11 @@ namespace Rido.Services
             return new LoginResponse
             {
                 Success = true,
-                Token = _jwtService.GenerateToken(user.Id.ToString(), user.Email)
+                Token = _jwtService.GenerateToken(user.Id.ToString(), user.Email,user.Role)
             };
         }
 
-        public async Task<bool> RegisterUserAsync(RegisterUserDto requestDto)
+        public async Task<string> RegisterUserAsync(RegisterUserDto requestDto)
         {
             var existingUser = await _userSpecificRepository.GetUserByEmail(requestDto.Email);
             if (existingUser != null)

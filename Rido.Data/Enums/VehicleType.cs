@@ -10,12 +10,11 @@ namespace Rido.Data.Enums
     {
         Sedan = 1,
         SUV = 2,
-        Hatchback = 3,
-        Coupe = 4,
-        Van = 5,
-        Truck = 6,
-        Motorcycle = 7,
-        Other = 8
+        Coupe = 3,
+        Van = 4,
+        AutoRikshaw = 5,
+        Motorcycle = 6,
+        Other = 7
     }
 
 }

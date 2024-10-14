@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Rido.Data.Contexts;
@@ -15,13 +16,17 @@ namespace Rido.Data.Repositories
             _context = context;
         }
 
-        public async Task<bool> AddAsync(T entity)
+        public async Task<string> AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
-            return await _context.SaveChangesAsync() > 0;
+            await _context.SaveChangesAsync();
+
+            var propertyInfo = typeof(T).GetProperty("Id");
+            return propertyInfo.GetValue(entity) as string;
         }
 
-        public async Task<T> GetByIdAsync(int id)
+
+        public async Task<T> GetByIdAsync(string id)
         {
             return await _context.Set<T>().FindAsync(id);
         }
@@ -37,7 +42,7 @@ namespace Rido.Data.Repositories
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(string id)
         {
             var entity = await GetByIdAsync(id);
             if (entity == null)
@@ -47,6 +52,24 @@ namespace Rido.Data.Repositories
 
             _context.Set<T>().Remove(entity);
             return await _context.SaveChangesAsync() > 0;
+        }
+        public async Task<T> FindAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>().FirstOrDefaultAsync(predicate);
+        }
+        public async Task<T> FindFirstAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>().FirstAsync(predicate);
+        }
+
+        public async Task<T> FindFirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>().FirstOrDefaultAsync(predicate);
+        }
+
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>().Where(predicate).ToListAsync();
         }
     }
 }

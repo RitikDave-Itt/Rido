@@ -9,8 +9,8 @@ namespace Rido.Data.Entities
 {
     public class DriverData
     {
-        public int Id { get; set; }
-        public int UserId { get; set; }       
+        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string UserId { get; set; }       
         public string LicenseType { get; set; }        
         public string LicenseNumber { get; set; }    
 

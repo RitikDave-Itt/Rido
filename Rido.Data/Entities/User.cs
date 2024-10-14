@@ -5,7 +5,7 @@ namespace Rido.Data.Entities
 {
     public class User
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         public string FirstName { get; set; }
         public string LastName { get; set; }
 

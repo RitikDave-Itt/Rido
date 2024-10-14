@@ -13,7 +13,8 @@ namespace Rido.Web
         {
             var builder = WebApplication.CreateBuilder(args);
 
-   
+            builder.Services.AddHttpClients(builder.Configuration);
+
             builder.Services.ConfigureServices(builder.Configuration);
             builder.Services.ConfigureRepositories (builder.Configuration);
 
@@ -41,7 +42,7 @@ namespace Rido.Web
             }
 
             app.UseHttpsRedirection();
-
+            app.UseAuthentication();  // Add Authentication before Authorization
             app.UseAuthorization();
 
             app.MapControllers();

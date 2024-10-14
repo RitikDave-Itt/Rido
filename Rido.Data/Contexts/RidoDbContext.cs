@@ -15,6 +15,8 @@ namespace Rido.Data.Contexts
 
         public DbSet<Entities.User> Users { get; set; }
         public DbSet<Entities.DriverData> DriverData { get; set; }
+        public DbSet<Entities.DriverLocation> DriverLocations { get; set; }
+
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -23,6 +25,8 @@ namespace Rido.Data.Contexts
 
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.User>)new Configurations.UserConfig());
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.DriverData>)new Configurations.DriverDataConfig());
+            modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.DriverLocation>)new Configurations.DriverLocationConfig());
+
 
 
 

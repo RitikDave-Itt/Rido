@@ -3,75 +3,83 @@ using Rido.Common.Models.Requests;
 using Rido.Services.Interfaces;
 using Rido.Common.Attributes;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Rido.Web.Controllers
 {
+    [AllowAnonymous]
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthServices _authService;
+        private readonly ILogger _logger;
 
-        public AuthController(IAuthServices authService)
+        public AuthController(IAuthServices authService, ILogger logger)
         {
             _authService = authService;
+            _logger = logger;
         }
 
-        /// <summary>
-        /// Registers a new user with the provided details.
-        /// </summary>
-        /// <param name="request">User registration details including email, phone number, password, and full name.</param>
-        /// <returns>Returns a success message if the user is registered successfully, otherwise returns an error.</returns>
-        /// <response code="200">Returns success status if registration is successful.</response>
-        /// <response code="400">Returns if the request data is invalid.</response>
-        /// <response code="500">Returns if there is an error during user registration.</response>
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDto request)
         {
-            if (!ModelState.IsValid)
+            try
             {
-                return BadRequest(ModelState);
-            }
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
+                }
 
-            var result = await _authService.RegisterUserAsync(request);
-            if (!result)
+                var result = await _authService.RegisterUserAsync(request);
+                if (string.IsNullOrEmpty(result))
+                {
+                    return StatusCode(500, "An error occurred while creating the user.");
+                }
+
+                return Ok(new { success = true });
+            }
+            catch (Exception ex)
             {
-                return StatusCode(500, "An error occurred while creating the user.");
-            }
+                _logger.LogError(ex, "An error occurred while registering the user.");
 
-            return Ok(new { success = true });
+                return StatusCode(500, new { Message = "Failed to register the user. Please try again later.", Error = ex.Message });
+            }
         }
 
-        /// <summary>
-        /// Authenticates a user and returns a JWT token in a secure cookie.
-        /// </summary>
-        /// <param name="request">User login credentials, including email and password.</param>
-        /// <returns>Returns the JWT token upon successful authentication.</returns>
-        /// <response code="200">Returns the token if login is successful.</response>
-        /// <response code="400">Returns if the login request data is invalid.</response>
-        /// <response code="500">Returns if the login fails due to incorrect credentials.</response>
+
         [HttpPost("login")]
         [PrintHello]
         public async Task<IActionResult> LoginUser([FromBody] LoginUserDto request)
         {
-            var result = await _authService.LoginUserAsync(request);
-
-            if (!result.Success)
+            try
             {
-                return StatusCode(500, "Email or Password Invalid!");
+                var result = await _authService.LoginUserAsync(request);
+
+                if (!result.Success)
+                {
+                    return StatusCode(500, "Email or Password Invalid!");
+                }
+
+                var cookieOptions = new CookieOptions
+                {
+                    HttpOnly = true,
+                    SameSite = SameSiteMode.Strict,
+                    Expires = DateTimeOffset.Now.AddMinutes(60),
+                    Path = "/"
+                };
+
+                Response.Cookies.Append("access_token", result.Token, cookieOptions);
+
+                return Ok(result);
             }
-
-            var cookieOptions = new CookieOptions
+            catch (Exception ex)
             {
-                HttpOnly = true,
-                SameSite = SameSiteMode.Strict,
-                Expires = DateTimeOffset.UtcNow.AddMinutes(60),
-                Path = "/"
-            };
+                _logger.LogError(ex, "An error occurred while logging in the user.");
 
-            Response.Cookies.Append("access_token", result.Token, cookieOptions);
-
-            return Ok(result);
+                return StatusCode(500, new { Message = "Failed to log in. Please try again later.", Error = ex.Message });
+            }
         }
+
     }
 }

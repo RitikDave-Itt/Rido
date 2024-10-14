@@ -11,7 +11,7 @@ namespace Rido.Services.Interfaces
     public interface IAuthServices
     {
         public Task<LoginResponse> LoginUserAsync(LoginUserDto loginUserDto);
-        public Task<bool> RegisterUserAsync(RegisterUserDto requestDto);
+        public Task<string> RegisterUserAsync(RegisterUserDto requestDto);
 
 
     }
