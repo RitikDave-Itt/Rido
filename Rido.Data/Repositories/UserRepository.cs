@@ -6,7 +6,7 @@ using Rido.Data.Repositories.Interfaces;
 
 namespace Rido.Data.Repositories
 {
-    public class UserRepository : Repository<User>, IUserRepository
+    public class UserRepository : BaseRepository<User>, IUserRepository
     {
         private readonly RidoDbContext _context;
 

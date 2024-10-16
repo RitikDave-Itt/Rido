@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace Rido.Data.Repositories.Interfaces
 {
-    public interface IRepository<T> where T : class
+    public interface IBaseRepository<T> where T : class
     {
         Task<string> AddAsync(T entity);
         Task<T> GetByIdAsync(string id);

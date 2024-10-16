@@ -13,13 +13,13 @@ namespace Rido.Services
 {
     public class DriverService : IDriverService
     {
-        private readonly IRepository<DriverData> _driverRepository;
-        private readonly IRepository<User> _userRepository;
+        private readonly IBaseRepository<DriverData> _driverRepository;
+        private readonly IBaseRepository<User> _userRepository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
 
-        public DriverService(IRepository<DriverData> driverRepository, IMapper mapper, IRepository<User> userRepository,IHttpContextAccessor httpContextAccessor
+        public DriverService(IBaseRepository<DriverData> driverRepository, IMapper mapper, IBaseRepository<User> userRepository,IHttpContextAccessor httpContextAccessor
 )
         {
             _driverRepository = driverRepository;

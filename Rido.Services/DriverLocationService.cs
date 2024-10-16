@@ -16,11 +16,11 @@ namespace Rido.Services
 {
     public class DriverLocationService : IDriverLocationService
     {
-        private IRepository<DriverLocation> _repository;
+        private IBaseRepository<DriverLocation> _repository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
 
-        public DriverLocationService(IRepository<DriverLocation> repository, IHttpContextAccessor httpContextAccessor) {
+        public DriverLocationService(IBaseRepository<DriverLocation> repository, IHttpContextAccessor httpContextAccessor) {
         _repository = repository;
             _httpContextAccessor = httpContextAccessor;
 

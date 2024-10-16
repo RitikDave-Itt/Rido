@@ -8,7 +8,8 @@ namespace Rido.Common.Mappings
     {
         public UserProfile()
         {
-            CreateMap<RegisterUserDto, User>();
+            CreateMap<RegisterUserDto, User>()
+                ;
         }
     }
 }

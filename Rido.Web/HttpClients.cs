@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Rido.Common.Utils;
 using Rido.Services;
 
 namespace Rido.Web
@@ -7,7 +8,7 @@ namespace Rido.Web
     {
         public static void AddHttpClients(this IServiceCollection services , IConfiguration configuration)
         {
-            services.AddHttpClient<LocationServices>("location",
+            services.AddHttpClient<LocationUtils>("location",
                 client =>{
                 client.BaseAddress = new Uri("https://us1.locationiq.com/v1/");
                     var apiKey = configuration["LocationIQ:ApiKey"];

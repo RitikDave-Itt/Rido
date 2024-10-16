@@ -4,16 +4,17 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using Rido.Services.Interfaces;
 using Rido.Data.Enums;
+
+using Rido.Common.Secrets;
 
 namespace Rido.Services
 {
-    public class JwtService : IJwtService
+    public class JwtUtil 
     {
         private readonly JwtSettings _jwtSettings;
 
-        public JwtService(IOptions<JwtSettings> jwtSettings)
+        public JwtUtil(IOptions<JwtSettings> jwtSettings)
         {
             _jwtSettings = jwtSettings.Value;
         }

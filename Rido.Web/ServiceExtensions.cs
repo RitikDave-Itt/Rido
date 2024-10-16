@@ -15,12 +15,19 @@ namespace Rido.Web
         public static void ConfigureServices(this IServiceCollection services, IConfiguration configuration)
         {
             services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
-            services.AddScoped<IJwtService, JwtService>();
+            services.AddScoped<JwtUtil>();
             services.AddScoped<IAuthServices, AuthService>();
             services.AddScoped<IDriverService, DriverService>();
 
-            services.AddScoped<ILocationServices, LocationServices>();
             services.AddScoped<IDriverLocationService, DriverLocationService>();
+            services.AddScoped<IRideService, RideService>();
+            services.AddScoped<LocationUtils>();
+
+
+
+
+            services.AddScoped<RideService>();
+
 
 
             services.AddAutoMapper(typeof(UserProfile));

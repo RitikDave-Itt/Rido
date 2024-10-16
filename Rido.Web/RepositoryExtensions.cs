@@ -15,7 +15,7 @@ namespace Rido.Web
                 options.UseSqlServer(configuration.GetConnectionString("connectionString")));
 
             services.AddScoped<IUserRepository, UserRepository>();
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
         }
     }
 }

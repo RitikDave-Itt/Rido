@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rido.Services
+namespace Rido.Common.Secrets
 {
     public class JwtSettings
     {
@@ -14,5 +14,3 @@ namespace Rido.Services
         public int ExpiryInMinutes { get; set; }
     }
 }
-
-

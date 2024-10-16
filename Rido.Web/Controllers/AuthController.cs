@@ -13,12 +13,10 @@ namespace Rido.Web.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IAuthServices _authService;
-        private readonly ILogger _logger;
 
-        public AuthController(IAuthServices authService, ILogger logger)
+        public AuthController(IAuthServices authService)
         {
             _authService = authService;
-            _logger = logger;
         }
 
         [HttpPost("register")]
@@ -41,7 +39,6 @@ namespace Rido.Web.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while registering the user.");
 
                 return StatusCode(500, new { Message = "Failed to register the user. Please try again later.", Error = ex.Message });
             }
@@ -75,7 +72,6 @@ namespace Rido.Web.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while logging in the user.");
 
                 return StatusCode(500, new { Message = "Failed to log in. Please try again later.", Error = ex.Message });
             }

@@ -5,18 +5,17 @@ using Rido.Common.Models.Requests;
 using Rido.Common.Models.Responses;
 using Rido.Common.Models.Types;
 using Rido.Common.Secrets;
-using Rido.Services.Interfaces;
 
 
 namespace Rido.Services
 {
-    public class LocationServices : ILocationServices
+    public  class LocationUtils 
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly string _key ;
 
 
-        public LocationServices(IHttpClientFactory httpClientFactory,IOptions<LocationSecrets> locationSecrets)
+        public LocationUtils(IHttpClientFactory httpClientFactory,IOptions<LocationSecrets> locationSecrets)
         {
             _httpClientFactory = httpClientFactory;
             _key = locationSecrets.Value.ApiKey;

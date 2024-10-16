@@ -17,11 +17,11 @@ namespace Rido.Web.Controllers
 
     public class LocationController : ControllerBase
     {
-        private readonly ILocationServices _locationServices;
+        private readonly LocationUtils _locationServices;
         private readonly ILogger<DriverLocationController> _logger;
 
 
-        public LocationController(ILocationServices locationServices , ILogger<DriverLocationController> logger)
+        public LocationController(LocationUtils locationServices , ILogger<DriverLocationController> logger)
         {
             _locationServices = locationServices;
             _logger = logger;

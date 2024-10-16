@@ -21,6 +21,7 @@ namespace Rido.Common.Models.Requests
         public Gender Gender { get; set; }
 
 
+
         [Required(ErrorMessage = "Phone number is required.")]
         [PhoneNumber(ErrorMessage = "Invalid phone number format.")]
         public string PhoneNumber { get; set; }

@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Rido.Common.Secrets;
 using Rido.Data.Contexts;
 using Rido.Services;
 using System.Reflection;

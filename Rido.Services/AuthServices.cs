@@ -12,12 +12,12 @@ namespace Rido.Services
 {
     public class AuthService : IAuthServices
     {
-        private readonly IRepository<User> _userRepository;
+        private readonly IBaseRepository<User> _userRepository;
         private readonly IUserRepository _userSpecificRepository;
-        private readonly IJwtService _jwtService;
+        private readonly JwtUtil _jwtService;
         private readonly IMapper _mapper;
 
-        public AuthService(IRepository<User> userRepository, IUserRepository userSpecificRepository, IJwtService jwtService, IMapper mapper)
+        public AuthService(IBaseRepository<User> userRepository, IUserRepository userSpecificRepository, JwtUtil jwtService, IMapper mapper)
         {
             _userRepository = userRepository;
             _userSpecificRepository = userSpecificRepository;

@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Rido.Data.Contexts;
 
@@ -11,9 +12,11 @@ using Rido.Data.Contexts;
 namespace Rido.Data.Migrations
 {
     [DbContext(typeof(RidoDbContext))]
-    partial class RidoDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241015102455_UpdateRideRequestTable")]
+    partial class UpdateRideRequestTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -126,9 +129,6 @@ namespace Rido.Data.Migrations
                     b.Property<double>("DistanceInKm")
                         .HasColumnType("float");
 
-                    b.Property<string>("DriverId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("GeohashCode")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -165,10 +165,6 @@ namespace Rido.Data.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("DriverId")
-                        .IsUnique()
-                        .HasFilter("[DriverId] IS NOT NULL");
 
                     b.HasIndex("GeohashCode");
 

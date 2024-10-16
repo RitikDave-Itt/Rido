@@ -7,11 +7,11 @@ using Rido.Data.Repositories.Interfaces;
 
 namespace Rido.Data.Repositories
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class BaseRepository<T> : IBaseRepository<T> where T : class
     {
         protected readonly RidoDbContext _context;
 
-        public Repository(RidoDbContext context)
+        public BaseRepository(RidoDbContext context)
         {
             _context = context;
         }
