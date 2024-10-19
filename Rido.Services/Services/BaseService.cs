@@ -4,7 +4,10 @@ using System.Linq.Expressions;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
+using AutoMapper;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Rido.Common.Mappings;
 using Rido.Data.Repositories.Interfaces;
 using Rido.Services.Interfaces;
 
@@ -14,11 +17,15 @@ namespace Rido.Services
     {
         protected readonly IBaseRepository<T> _repository;
         protected readonly IHttpContextAccessor _httpContextAccessor;
+        protected readonly IMapper _mapper;
 
-        public BaseService(IBaseRepository<T> repository , IHttpContextAccessor contextAccessor)
+        public BaseService(IServiceProvider serviceProvider)
         {
-            _repository = repository;
-            _httpContextAccessor = contextAccessor;
+            
+            _repository = serviceProvider.GetRequiredService<IBaseRepository<T>>();
+            _httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+            _mapper = serviceProvider.GetRequiredService<IMapper>();
+
         }
 
         protected string GetCurrentUserId()

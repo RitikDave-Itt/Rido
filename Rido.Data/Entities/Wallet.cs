@@ -20,10 +20,7 @@ namespace Rido.Data.Entities
 
         public WalletStatus WalletStatus { get; set; } = WalletStatus.Active;
 
-        [JsonIgnore]
-        [Ignore]
-
-        public User User { get; set; }
+   
 
 
     }

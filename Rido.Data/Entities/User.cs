@@ -22,17 +22,15 @@ namespace Rido.Data.Entities
         public string PasswordHash { get; set; }
         public UserRole Role { get; set; }
 
-        [JsonIgnore]
-        [Ignore]
-        public DriverData DriverData { get; set; }
-        [JsonIgnore]
-        [Ignore]
-        public DriverLocation DriverLocation { get; set; }
+        public DriverData? DriverData { get; set; } = null;
 
-        [JsonIgnore]
-        [Ignore]
-        public Wallet Wallet { get; set; }
+        public RideRequest? RideRequest { get; set; } = null;
 
+        public Wallet? Wallet { get; set; }
+
+        public DriverLocation? location { get; set; } = null;
+
+       
 
     }
 }

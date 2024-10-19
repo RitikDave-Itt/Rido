@@ -22,7 +22,7 @@ namespace Rido.Data.Configurations
             builder.Property(x => x.Balance)
                 .HasColumnType("decimal(7,2)");
 
-                builder.HasOne(x=>x.User)
+                builder.HasOne<User>()
                 .WithOne(u=>u.Wallet)
                 .HasForeignKey<Wallet>(x=>x.UserId)
                 .OnDelete(DeleteBehavior.Cascade);

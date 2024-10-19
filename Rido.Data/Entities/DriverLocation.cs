@@ -28,8 +28,8 @@ namespace Rido.Data.Entities
 
         public VehicleType VehicleType { get; set; }
 
-        [JsonIgnore]
-        [Ignore]
         public User User { get; set; }
+
+      
     }
 }

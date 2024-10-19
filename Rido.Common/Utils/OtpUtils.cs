@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Rido.Common.Utils
 {
-    public static class StringUtils
+    public static class OtpUtils
     {
-        public static string ExtractDigits(string input)
+        public static string GenerateOtp(string input)
         {
             StringBuilder digits = new StringBuilder();
 

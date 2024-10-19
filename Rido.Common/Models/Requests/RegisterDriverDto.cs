@@ -6,7 +6,6 @@ namespace Rido.Common.Models.Requests
 {
     public class RegisterDriverDto
     {
-        public string? UserId { get; set; }
 
         [StringLength(50, ErrorMessage = "License Type cannot exceed 50 characters.")]
         public string? LicenseType { get; set; }

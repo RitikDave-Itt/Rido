@@ -13,32 +13,28 @@ using System.Text.RegularExpressions;
 
 namespace Rido.Services
 {
-    public class AuthService : IAuthServices
+    public class AuthService : BaseService<User>,IAuthServices
     {
-        private readonly IBaseRepository<User> _userRepository;
         private readonly IBaseRepository<DriverData> _driverRepository;
+        private readonly IUserRepository _userRepository;
 
-        private readonly IUserRepository _userSpecificRepository;
+
+
         private readonly JwtUtil _jwtService;
-        private readonly IMapper _mapper;
 
-        private readonly IBaseRepository<OneTimePassword> _otpRepository;
 
-        public AuthService(IBaseRepository<User> userRepository,IBaseRepository<DriverData> driverRepository, IUserRepository userSpecificRepository, JwtUtil jwtService, IMapper mapper,IBaseRepository<OneTimePassword> otpRepository)
+        public AuthService(IBaseRepository<DriverData> driverRepository, JwtUtil jwtService,IServiceProvider serviceProvider , IUserRepository userRepository):base(serviceProvider)
         {
-            _userRepository = userRepository;
-            _userSpecificRepository = userSpecificRepository;
             _jwtService = jwtService;
-            _mapper = mapper;
-            _otpRepository = otpRepository;
             _driverRepository = driverRepository;
+            _userRepository = userRepository;
 
 
         }
 
         public async Task<LoginResponse> LoginUserAsync(LoginUserDto loginUserDto)
         {
-            var user = await _userSpecificRepository.GetUserByEmail(loginUserDto.Email);
+            var user = await _repository.FindFirstAsync(u=>u.Email==loginUserDto.Email);
 
             if (user == null || !PasswordHasher.VerifyPassword(user.PasswordHash, loginUserDto.Password))
             {
@@ -52,35 +48,40 @@ namespace Rido.Services
             };
         }
 
-        public async Task<string> RegisterUserAsync(RegisterUserDto userDto,RegisterDriverDto driverDto)
+        public async Task<string> RegisterUserAsync(RegisterUserDto userDto,RegisterDriverDto driverDto = null)
         {
 
             userDto.PasswordHash = PasswordHasher.HashPassword(userDto.PasswordHash);
             var user = _mapper.Map<User>(userDto);
 
+            DriverData driver = new DriverData();
+            if (driverDto != null) { 
+            driver = _mapper.Map<DriverData>(driverDto);
 
-            var registeredUser = await _userRepository.AddAsync(user);
-
-            if (user.Role == UserRole.Driver)
+            }
+            else
             {
-
-                driverDto.UserId = registeredUser.Id;
-
-                var drievr = _mapper.Map<DriverData>(driverDto);
-
-                var saveDriver = await _driverRepository.AddAsync(drievr);
+                driver = null;
             }
 
+            Wallet wallet = new Wallet()
+            {
+                Balance = 10000,
+                UserId = user.Id,
+                WalletStatus = WalletStatus.Active
+            };
 
-            
+            var registeredUser = await _userRepository.CreateUser(user, wallet,driver);
 
-            return  registeredUser.Id;
+
+
+            return  registeredUser;
         }
 
         public async Task<bool> VerifyOTP(string otp, string rideRequestId)
         {
            
-         return StringUtils.MatchOTP(rideRequestId, otp);
+         return OtpUtils.MatchOTP(rideRequestId, otp);
         }
 
 

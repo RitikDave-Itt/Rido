@@ -15,18 +15,13 @@ namespace Rido.Services
     {
 
         private IBaseRepository<DriverLocation> _driverLocationRepository;
-        private IMapper _mapper;
-        private IRideRequestRepository _rideRequestRepository;
-        private IBaseRepository<OneTimePassword> _otpRepository;
+        private IBaseRepository<RideRequest> _rideRequestRepository;
 
 
-        public RideService(IBaseRepository<OneTimePassword> otpReporitory, IBaseRepository<DriverLocation> driverLocationRepository, IBaseRepository<RideRequest> repository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IRideRequestRepository rideRequestRepository) : base(repository, httpContextAccessor)
+        public RideService( IBaseRepository<DriverLocation> driverLocationRepository, IBaseRepository<RideRequest> rideRequestRepository, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _driverLocationRepository = driverLocationRepository;
-            _mapper = mapper;
             _rideRequestRepository = rideRequestRepository;
-            _otpRepository = otpReporitory;
-
         }
 
 
@@ -123,18 +118,29 @@ namespace Rido.Services
 
         }
 
-        public async Task<RideAndDriverDetailJoin> GetRideAndDriverDetail(string rideRequestId)
+        public async Task<dynamic> GetRideAndDriverDetail(string rideRequestId)
         {
-            var result = await _rideRequestRepository.GetRideAndDriverDetailsByIdAsync(rideRequestId);
+            var result = await _rideRequestRepository.FindFirstAsync(r=>r.Id==rideRequestId,r=>r.Driver, result=>result.Driver.location,r=>r.Driver.DriverData);
 
-            
-
-            if (result != null)
+            var response = new
             {
-                result.OTP = StringUtils.ExtractDigits(result.RideRequestId);
-            }
+                Id = rideRequestId,
+                DriverName = result.Driver.FirstName + " " + result.Driver.LastName,
+                MobileNo = result.Driver.PhoneNumber,
+                VehicleType = result.VehicleType.ToString(),
+                Latitude = result?.Driver?.location?.Latitude?.ToString(),
+                Longitude = result?.Driver?.location?.Longitude?.ToString(),
+                Otp = OtpUtils.GenerateOtp(rideRequestId)
 
-            return result;
+
+
+
+
+
+
+            };
+
+            return response;
         }
 
 

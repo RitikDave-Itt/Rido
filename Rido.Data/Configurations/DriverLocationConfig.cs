@@ -36,8 +36,8 @@ namespace Rido.Data.Configurations
                 .IsUnique();
             builder.HasIndex(p => p.Geohash);
 
-            builder.HasOne(u=>u.User)
-                .WithOne(p=>p.DriverLocation)
+            builder.HasOne(l=>l.User)
+                .WithOne(u=>u.location)
                 .HasForeignKey<DriverLocation>(u=>u.UserId)
                 .OnDelete(DeleteBehavior.Cascade);
 

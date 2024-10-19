@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace Rido.Data.Repositories.Interfaces
 {
-    public interface IRideRequestRepository
+    public interface IRideTransactionRepository
     {
-        Task<RideAndDriverDetailJoin> GetRideAndDriverDetailsByIdAsync(string rideRequestId);
+        public Task<string> RideSpendTransaction(string rideRequestId);
 
     }
 }

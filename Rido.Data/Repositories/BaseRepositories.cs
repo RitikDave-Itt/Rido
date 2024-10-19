@@ -20,20 +20,21 @@ namespace Rido.Data.Repositories
         {
             await _context.Set<T>().AddAsync(entity);
             await _context.SaveChangesAsync();
-
-            return entity;     
+            return entity;
         }
-
 
         public async Task<T> GetByIdAsync(string id)
         {
             return await _context.Set<T>().FindAsync(id);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync()
+        public async Task<IEnumerable<T>> GetAllAsync(params Expression<Func<T, object>>[] includes)
         {
-            return await _context.Set<T>().ToListAsync();
+            var query = ApplyIncludes(_context.Set<T>(), includes);
+            return await query.ToListAsync();
         }
+
+
 
         public async Task<bool> UpdateAsync(T entity)
         {
@@ -52,20 +53,38 @@ namespace Rido.Data.Repositories
             _context.Set<T>().Remove(entity);
             return await _context.SaveChangesAsync() > 0;
         }
-        public async Task<T> FindAsync(Expression<Func<T, bool>> predicate)
+
+        public async Task<T> FindAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
         {
-            return await _context.Set<T>().FirstOrDefaultAsync(predicate);
-        }
-        public async Task<T> FindFirstAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _context.Set<T>().FirstAsync(predicate);
+            var query = ApplyIncludes(_context.Set<T>().Where(predicate), includes);
+            return await query.FirstOrDefaultAsync();
         }
 
-     
-
-        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate)
+        public async Task<T> FindFirstAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
         {
-            return await _context.Set<T>().Where(predicate).ToListAsync();
+            var query = ApplyIncludes(_context.Set<T>().Where(predicate), includes);
+            return await query.FirstAsync();
+        }
+
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate, params Expression<Func<T, object>>[] includes)
+        {
+            var query = ApplyIncludes(_context.Set<T>().Where(predicate), includes);
+            return await query.ToListAsync();
+        }
+
+        
+
+        private IQueryable<T> ApplyIncludes(IQueryable<T> query, params Expression<Func<T, object>>[] includes)
+        {
+            if (includes != null)
+            {
+                foreach (var include in includes)
+                {
+                    query = query.Include(include);
+                }
+            }
+
+            return query;
         }
     }
 }

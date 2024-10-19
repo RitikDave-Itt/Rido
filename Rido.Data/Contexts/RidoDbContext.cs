@@ -18,9 +18,14 @@ namespace Rido.Data.Contexts
         public DbSet<Entities.DriverLocation> DriverLocations { get; set; }
         public DbSet<Entities.RideRequest> RideRequests { get; set; }
 
-        public DbSet<Entities.OneTimePassword> OneTimePasswords { get; set; }
 
-        public DbSet<Entities.Wallet> Wallets { get; set; } 
+        public DbSet<Entities.Wallet> Wallets { get; set; }
+        public DbSet<Entities.RideTransaction> RideTransactions { get; set; }
+
+        public DbSet<Entities.RideBooking> RideBookings { get; set; }
+        public DbSet<Entities.RideReview> RideReviews { get; set; }
+
+
 
 
 
@@ -33,8 +38,13 @@ namespace Rido.Data.Contexts
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.DriverData>)new Configurations.DriverDataConfig());
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.DriverLocation>)new Configurations.DriverLocationConfig());
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.RideRequest>)new Configurations.RideRequestConfig());
-            modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.OneTimePassword>)new Configurations.OneTimePasswordConfig());
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.Wallet>)new Configurations.WalletConfig());
+            modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.RideTransaction>)new Configurations.RideTransactionConfig());
+            modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.RideBooking>)new Configurations.RideBookingConfig());
+            modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.RideReview>)new Configurations.RideReviewConfig());
+
+
+
 
 
 

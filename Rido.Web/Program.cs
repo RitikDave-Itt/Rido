@@ -1,9 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Rido.Data.Contexts;
-using Rido.Data.Repositories;
-using Rido.Data.Repositories.Interfaces;
-using static System.Net.Mime.MediaTypeNames;
+using Rido.Common;
+using Rido.Data;
+using Rido.Services;
 
 namespace Rido.Web
 {
@@ -13,28 +10,23 @@ namespace Rido.Web
         {
             var builder = WebApplication.CreateBuilder(args);
 
+
+            builder.Services.ConfigureDbContext(builder.Configuration);
+            builder.Services.ConfigureRepositories();
             builder.Services.AddHttpClients(builder.Configuration);
-
-            builder.Services.ConfigureServices(builder.Configuration);
-            builder.Services.ConfigureRepositories (builder.Configuration);
-            builder.Services.BaseServiceConfig();
-
-
+            builder.Services.ConfigureAuthentication(builder.Configuration);
+            builder.Services.ConfigureServices();
+            builder.Services.ConfigureUtility();
+            builder.Services.AddHttpContextAccessor();
+            builder.Services.ConfigureSwagger();
+            builder.Services.AddControllers();
 
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
 
-
-
             var app = builder.Build();
 
-            //app.Use(async(context, next) =>
-            //{
-            //    Console.WriteLine("before req");
-            //    await next.Invoke();
-            //    Console.WriteLine("after req");
-            //});
-            // Configure middleware
+
             if (app.Environment.IsDevelopment())
             {
                 app.UseSwagger();
@@ -43,7 +35,7 @@ namespace Rido.Web
             }
 
             app.UseHttpsRedirection();
-            app.UseAuthentication();  // Add Authentication before Authorization
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllers();

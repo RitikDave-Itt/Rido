@@ -24,8 +24,7 @@ namespace Rido.Data.Entities
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
 
-        [JsonIgnore]
-        [Ignore]
         public User User { get; set; }
+
     }
 }

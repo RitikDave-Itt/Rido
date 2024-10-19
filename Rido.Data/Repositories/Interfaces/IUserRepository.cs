@@ -6,8 +6,8 @@ namespace Rido.Data.Repositories.Interfaces
 {
     public interface IUserRepository
     {
-       
-        Task<User> GetUserByEmail(string email);
+
+        public Task<string> CreateUser(User user, Wallet wallet, DriverData driver = null);
 
     }
 }

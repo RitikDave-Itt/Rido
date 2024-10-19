@@ -21,7 +21,7 @@ namespace Rido.Services.Interfaces
         Task<bool> CancelRideByDriver(string rideRequestId);
 
         Task<RideRequest> AssignRideDriver(string rideRequestId);
-        Task<RideAndDriverDetailJoin> GetRideAndDriverDetail(string rideRequestId);
+        Task<dynamic> GetRideAndDriverDetail(string rideRequestId);
 
     }
 }
