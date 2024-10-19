@@ -14,7 +14,7 @@ namespace Rido.Web.Controllers
     {
         private readonly IRideReviewService _rideReviewService;
 
-        public RideReviewController(IRideReviewService rideReviewService, IServiceProvider serviceProvider) : base(serviceProvider)
+        public RideReviewController(IRideReviewService rideReviewService,  IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _rideReviewService = rideReviewService;
         }
