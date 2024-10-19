@@ -33,7 +33,7 @@ namespace Rido.Services
             var geohasher = new Geohasher();
             string geohash = geohasher.Encode(Convert.ToDouble(location.Latitude), Convert.ToDouble(location.Longitude), 5);
 
-            var existingLocation = await _repository.FindAsync(dl => dl.DriverId == driverId && dl.VehicleType == vehicleType);
+            var existingLocation = await _repository.FindAsync(dl => dl.UserId == driverId && dl.VehicleType == vehicleType);
 
 
 
@@ -49,7 +49,7 @@ namespace Rido.Services
             {
                 DriverLocation newDriverLocation = new DriverLocation
                 {
-                    DriverId = driverId,
+                    UserId = driverId,
                     Latitude = location.Latitude,
                     Longitude = location.Longitude,
                     Geohash = geohash,

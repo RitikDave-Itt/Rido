@@ -47,7 +47,18 @@ namespace Rido.Data.Configurations
                 .HasDefaultValueSql("GETDATE()");     
 
             builder.Property(d => d.UpdatedAt)
-                .HasDefaultValueSql("GETDATE()"); 
+                .HasDefaultValueSql("GETDATE()");
+
+            builder.HasOne(d=>d.User)
+                .WithOne(u=>u.DriverData)
+                .HasForeignKey<DriverData>(d=>d.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            
+
+
+
+            
         }
     }
 }

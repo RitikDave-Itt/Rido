@@ -17,6 +17,7 @@ namespace Rido.Web
 
             builder.Services.ConfigureServices(builder.Configuration);
             builder.Services.ConfigureRepositories (builder.Configuration);
+            builder.Services.BaseServiceConfig();
 
 
 

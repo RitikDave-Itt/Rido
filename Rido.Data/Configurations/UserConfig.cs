@@ -54,8 +54,10 @@ namespace Rido.Data.Configurations
                 .HasConversion<int>()
                 .HasDefaultValue(UserRole.User);
 
-            builder.HasIndex(p => p.Email)
-                .IsUnique();
+           
+
+
+           
         }
 
     }

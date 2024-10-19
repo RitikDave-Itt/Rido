@@ -11,7 +11,9 @@ namespace Rido.Services.Interfaces
     public interface IAuthServices
     {
         public Task<LoginResponse> LoginUserAsync(LoginUserDto loginUserDto);
-        public Task<string> RegisterUserAsync(RegisterUserDto requestDto);
+        public Task<string> RegisterUserAsync(RegisterUserDto userDto ,RegisterDriverDto driverDto);
+
+        public Task<bool> VerifyOTP(string otp, string rideRequestId);
 
 
     }

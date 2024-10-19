@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 using Rido.Services.Interfaces;
 using Rido.Common.Models.Responses;
 using AutoMapper;
+using Rido.Data.Contexts;
+using Rido.Data.Enums;
+using System.Text.RegularExpressions;
 
 
 namespace Rido.Services
@@ -13,16 +16,22 @@ namespace Rido.Services
     public class AuthService : IAuthServices
     {
         private readonly IBaseRepository<User> _userRepository;
+        private readonly IBaseRepository<DriverData> _driverRepository;
+
         private readonly IUserRepository _userSpecificRepository;
         private readonly JwtUtil _jwtService;
         private readonly IMapper _mapper;
 
-        public AuthService(IBaseRepository<User> userRepository, IUserRepository userSpecificRepository, JwtUtil jwtService, IMapper mapper)
+        private readonly IBaseRepository<OneTimePassword> _otpRepository;
+
+        public AuthService(IBaseRepository<User> userRepository,IBaseRepository<DriverData> driverRepository, IUserRepository userSpecificRepository, JwtUtil jwtService, IMapper mapper,IBaseRepository<OneTimePassword> otpRepository)
         {
             _userRepository = userRepository;
             _userSpecificRepository = userSpecificRepository;
             _jwtService = jwtService;
             _mapper = mapper;
+            _otpRepository = otpRepository;
+            _driverRepository = driverRepository;
 
 
         }
@@ -43,20 +52,37 @@ namespace Rido.Services
             };
         }
 
-        public async Task<string> RegisterUserAsync(RegisterUserDto requestDto)
+        public async Task<string> RegisterUserAsync(RegisterUserDto userDto,RegisterDriverDto driverDto)
         {
-            var existingUser = await _userSpecificRepository.GetUserByEmail(requestDto.Email);
-            if (existingUser != null)
+
+            userDto.PasswordHash = PasswordHasher.HashPassword(userDto.PasswordHash);
+            var user = _mapper.Map<User>(userDto);
+
+
+            var registeredUser = await _userRepository.AddAsync(user);
+
+            if (user.Role == UserRole.Driver)
             {
-                throw new InvalidOperationException("A user with this email already exists.");
+
+                driverDto.UserId = registeredUser.Id;
+
+                var drievr = _mapper.Map<DriverData>(driverDto);
+
+                var saveDriver = await _driverRepository.AddAsync(drievr);
             }
 
-            requestDto.PasswordHash = PasswordHasher.HashPassword(requestDto.PasswordHash);
-            var user = _mapper.Map<User>(requestDto);
 
+            
 
-
-            return await _userRepository.AddAsync(user);
+            return  registeredUser.Id;
         }
+
+        public async Task<bool> VerifyOTP(string otp, string rideRequestId)
+        {
+           
+         return StringUtils.MatchOTP(rideRequestId, otp);
+        }
+
+
     }
 }

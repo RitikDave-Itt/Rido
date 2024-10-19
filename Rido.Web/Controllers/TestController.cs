@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using System.IdentityModel.Tokens.Jwt;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/TestTest")]
 public class TestController : ControllerBase
 {
     // This action can be accessed by users with the "User" role

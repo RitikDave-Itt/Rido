@@ -27,7 +27,7 @@ namespace Rido.Services
 
         }
 
-        public async Task<string> AddAsync(T entity)
+        public async Task<T> AddAsync(T entity)
         {
             return await _repository.AddAsync(entity);
         }
@@ -62,11 +62,8 @@ namespace Rido.Services
             return await _repository.FindFirstAsync(predicate);
         }
 
-        public async Task<T> FindFirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _repository.FindFirstOrDefaultAsync(predicate);
-        }
-
+     
+        
         public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate)
         {
             return await _repository.FindAllAsync(predicate);

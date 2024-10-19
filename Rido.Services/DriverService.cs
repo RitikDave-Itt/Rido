@@ -37,14 +37,14 @@ namespace Rido.Services
             driverData.UpdatedAt = DateTime.UtcNow;
             driverData.UserId = currentUserId;
 
-            var driverId = await _driverRepository.AddAsync(driverData);
+            var driver = await _driverRepository.AddAsync(driverData);
 
             var user = await _userRepository.GetByIdAsync(driverData.UserId);
             if (user != null)
             {
                 user.Role = UserRole.Driver;
                 await _userRepository.UpdateAsync(user);
-                return driverId;
+                return driver.Id;
 
             }
             else

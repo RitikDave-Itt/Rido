@@ -18,6 +18,10 @@ namespace Rido.Data.Contexts
         public DbSet<Entities.DriverLocation> DriverLocations { get; set; }
         public DbSet<Entities.RideRequest> RideRequests { get; set; }
 
+        public DbSet<Entities.OneTimePassword> OneTimePasswords { get; set; }
+
+        public DbSet<Entities.Wallet> Wallets { get; set; } 
+
 
 
 
@@ -29,6 +33,8 @@ namespace Rido.Data.Contexts
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.DriverData>)new Configurations.DriverDataConfig());
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.DriverLocation>)new Configurations.DriverLocationConfig());
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.RideRequest>)new Configurations.RideRequestConfig());
+            modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.OneTimePassword>)new Configurations.OneTimePasswordConfig());
+            modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.Wallet>)new Configurations.WalletConfig());
 
 
 

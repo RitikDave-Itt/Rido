@@ -12,8 +12,8 @@ using Rido.Data.Contexts;
 namespace Rido.Data.Migrations
 {
     [DbContext(typeof(RidoDbContext))]
-    [Migration("20241014145056_Update1")]
-    partial class Update1
+    [Migration("20241016212623_InitDb")]
+    partial class InitDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -80,10 +80,6 @@ namespace Rido.Data.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("DriverId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Geohash")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -96,17 +92,95 @@ namespace Rido.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("VehicleType")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Geohash");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("DriverLocations", (string)null);
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.RideRequest", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("DestinationAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DestinationLatitude")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("DestinationLongitude")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<double>("DistanceInKm")
+                        .HasColumnType("float");
+
+                    b.Property<string>("DriverId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("GeohashCode")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<decimal>("MaxPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<decimal>("MinPrice")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("PickupAddress")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PickupLatitude")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PickupLongitude")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("PickupTime")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("VehicleType")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("DriverId")
+                        .IsUnique()
+                        .HasFilter("[DriverId] IS NOT NULL");
+
+                    b.HasIndex("GeohashCode");
+
+                    b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.HasIndex("Geohash");
+                    b.HasIndex("VehicleType");
 
-                    b.ToTable("DriverLocations", (string)null);
+                    b.ToTable("RideRequests", (string)null);
                 });
 
             modelBuilder.Entity("Rido.Data.Entities.User", b =>
@@ -166,10 +240,56 @@ namespace Rido.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.DriverData", b =>
+                {
+                    b.HasOne("Rido.Data.Entities.User", "User")
+                        .WithOne("DriverData")
+                        .HasForeignKey("Rido.Data.Entities.DriverData", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.DriverLocation", b =>
+                {
+                    b.HasOne("Rido.Data.Entities.User", "User")
+                        .WithOne("DriverLocation")
+                        .HasForeignKey("Rido.Data.Entities.DriverLocation", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.RideRequest", b =>
+                {
+                    b.HasOne("Rido.Data.Entities.User", "Driver")
+                        .WithOne()
+                        .HasForeignKey("Rido.Data.Entities.RideRequest", "DriverId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Rido.Data.Entities.User", "User")
+                        .WithOne()
+                        .HasForeignKey("Rido.Data.Entities.RideRequest", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Driver");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.User", b =>
+                {
+                    b.Navigation("DriverData")
+                        .IsRequired();
+
+                    b.Navigation("DriverLocation")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

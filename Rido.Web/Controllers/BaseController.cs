@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
+using AutoMapper;
 
 namespace Rido.Web.Controllers
 {
@@ -10,12 +11,15 @@ namespace Rido.Web.Controllers
     {
         protected readonly ILogger<T> _logger;
         protected readonly IHttpContextAccessor _httpContextAccessor;
+        protected readonly IMapper _mapper;
 
-        protected BaseController(ILogger<T> logger, IHttpContextAccessor httpContextAccessor)
+        protected BaseController(IServiceProvider serviceProvider)
         {
-            _logger = logger;
-            _httpContextAccessor = httpContextAccessor;
+            _logger = serviceProvider.GetRequiredService<ILogger<T>>();
+            _httpContextAccessor = serviceProvider.GetRequiredService<IHttpContextAccessor>();
+            _mapper = serviceProvider.GetRequiredService<IMapper>();
         }
+
 
         protected string GetCurrentUserId()
         {

@@ -17,7 +17,7 @@ namespace Rido.Data.Configurations
 
             builder.HasKey(p => p.Id);
 
-            builder.Property(p => p.DriverId)
+            builder.Property(p => p.UserId)
                 .IsRequired();
                 
                 
@@ -32,9 +32,15 @@ namespace Rido.Data.Configurations
 
             builder.Property(p => p.VehicleType)
                 .IsRequired();
-            builder.HasIndex(p => p.DriverId)
+            builder.HasIndex(p => p.UserId)
                 .IsUnique();
             builder.HasIndex(p => p.Geohash);
+
+            builder.HasOne(u=>u.User)
+                .WithOne(p=>p.DriverLocation)
+                .HasForeignKey<DriverLocation>(u=>u.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
         }
 
     }

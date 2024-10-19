@@ -13,7 +13,7 @@ namespace Rido.Web.Controllers
     [Authorize]
 
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/location")]
 
     public class LocationController : ControllerBase
     {
@@ -27,12 +27,12 @@ namespace Rido.Web.Controllers
             _logger = logger;
         }
 
-        [HttpGet("nearby")]
+        [HttpGet("nearby-places")]
         public async Task<ActionResult<List<NearbyLocation>>> GetNearbyLocations([FromQuery] GetNearbyLocationRequestDto requestDto)
         {
             if (requestDto == null)
             {
-                return BadRequest("Location request DTO cannot be null.");
+                return BadRequest("request DTO cannot be null.");
             }
 
             try
@@ -48,19 +48,19 @@ namespace Rido.Web.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while retrieving nearby locations.");
+                _logger.LogError(ex, "An error occurred retrieving nearby locations.");
 
-                return StatusCode(500, new { Message = "Failed to retrieve nearby locations. Please try again later.", Error = ex.Message });
+                return StatusCode(500, new { Message = "Failed to get nearby locations. .", Error = ex.Message });
             }
         }
 
 
-        [HttpGet("get-address")]
+        [HttpGet("accurate-address")]
         public async Task<ActionResult<ReverseGeocodeResponseDto>> GetAddress([FromQuery] LocationType requestDto)
         {
             if (requestDto == null)
             {
-                return BadRequest("Location request DTO cannot be null.");
+                return BadRequest("request DTO cannot be null.");
             }
 
             try
@@ -70,9 +70,9 @@ namespace Rido.Web.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while retrieving the address from coordinates.");
+                _logger.LogError(ex, "An error occurred retrieving the address.");
 
-                return StatusCode(500, new { Message = "Failed to retrieve the address. Please try again later.", Error = ex.Message });
+                return StatusCode(500, new { Message = "Failed to retrieve the address. .", Error = ex.Message });
             }
         }
 

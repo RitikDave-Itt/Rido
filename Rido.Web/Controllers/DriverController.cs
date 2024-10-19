@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Rido.Web.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/driver")]
     [ApiController]
     [Authorize]
     public class DriverController : ControllerBase
@@ -18,9 +18,9 @@ namespace Rido.Web.Controllers
         private readonly IHttpContextAccessor _httpContextAccessor;
 
 
-        public DriverController(IDriverService driverService 
-            ,ILogger<DriverController> logger
-            ,IHttpContextAccessor httpContextAccessor
+        public DriverController(IDriverService driverService
+            , ILogger<DriverController> logger
+            , IHttpContextAccessor httpContextAccessor
             )
         {
             _driverService = driverService;

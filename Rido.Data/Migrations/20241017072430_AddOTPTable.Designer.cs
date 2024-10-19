@@ -12,8 +12,8 @@ using Rido.Data.Contexts;
 namespace Rido.Data.Migrations
 {
     [DbContext(typeof(RidoDbContext))]
-    [Migration("20241015113941_UpdateRideRequestTable2")]
-    partial class UpdateRideRequestTable2
+    [Migration("20241017072430_AddOTPTable")]
+    partial class AddOTPTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -80,10 +80,6 @@ namespace Rido.Data.Migrations
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("DriverId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<string>("Geohash")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
@@ -96,17 +92,39 @@ namespace Rido.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("VehicleType")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("DriverId")
-                        .IsUnique();
-
                     b.HasIndex("Geohash");
 
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
                     b.ToTable("DriverLocations", (string)null);
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.OneTimePassword", b =>
+                {
+                    b.Property<string>("RideRequestId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("OTP")
+                        .IsRequired()
+                        .HasMaxLength(4)
+                        .HasColumnType("nvarchar(4)");
+
+                    b.Property<int>("TryCount")
+                        .HasColumnType("int");
+
+                    b.HasKey("RideRequestId");
+
+                    b.ToTable("OneTimePasswords", (string)null);
                 });
 
             modelBuilder.Entity("Rido.Data.Entities.RideRequest", b =>
@@ -130,7 +148,6 @@ namespace Rido.Data.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("DriverId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("GeohashCode")
@@ -171,7 +188,8 @@ namespace Rido.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DriverId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[DriverId] IS NOT NULL");
 
                     b.HasIndex("GeohashCode");
 
@@ -240,10 +258,73 @@ namespace Rido.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
-                        .IsUnique();
-
                     b.ToTable("Users", (string)null);
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.DriverData", b =>
+                {
+                    b.HasOne("Rido.Data.Entities.User", "User")
+                        .WithOne("DriverData")
+                        .HasForeignKey("Rido.Data.Entities.DriverData", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.DriverLocation", b =>
+                {
+                    b.HasOne("Rido.Data.Entities.User", "User")
+                        .WithOne("DriverLocation")
+                        .HasForeignKey("Rido.Data.Entities.DriverLocation", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.OneTimePassword", b =>
+                {
+                    b.HasOne("Rido.Data.Entities.RideRequest", "RideRequest")
+                        .WithOne("OneTimePassword")
+                        .HasForeignKey("Rido.Data.Entities.OneTimePassword", "RideRequestId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("RideRequest");
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.RideRequest", b =>
+                {
+                    b.HasOne("Rido.Data.Entities.User", "Driver")
+                        .WithOne()
+                        .HasForeignKey("Rido.Data.Entities.RideRequest", "DriverId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
+                    b.HasOne("Rido.Data.Entities.User", "User")
+                        .WithOne()
+                        .HasForeignKey("Rido.Data.Entities.RideRequest", "UserId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Driver");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.RideRequest", b =>
+                {
+                    b.Navigation("OneTimePassword")
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.User", b =>
+                {
+                    b.Navigation("DriverData")
+                        .IsRequired();
+
+                    b.Navigation("DriverLocation")
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

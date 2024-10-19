@@ -18,7 +18,7 @@ namespace Rido.Common.Utils
         private const int MotorcycleRatePerKm = 8;       
         private const int OtherRatePerKm = 15;
 
-        public decimal CalculateDistance(LocationType pickup , LocationType destinition)
+        public double CalculateDistance(LocationType pickup , LocationType destinition)
         {
             const double EarthRadius = 6371.0; 
 
@@ -37,21 +37,20 @@ namespace Rido.Common.Utils
                 Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
             double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
-            return (decimal)(EarthRadius * c);    
+            return EarthRadius * c;    
         }
 
-        public int CalculateFare(LocationType pickup, LocationType destinition ,VehicleType vehicle)
+        public decimal[] CalculateFare(double distanceInKm, VehicleType vehicle)
         {
 
-            var distanceInKm = CalculateDistance(pickup,destinition);
 
             int ratePerKm = GetRatePerKm(vehicle);
-            return (int) distanceInKm * ratePerKm;
+            return [(decimal)distanceInKm * ratePerKm ,(decimal) distanceInKm*ratePerKm+15];
         }
 
         public List<FareType> FareList(LocationType pickup, LocationType destination)
         {
-            decimal distance = CalculateDistance(pickup, destination);
+            double distance = CalculateDistance(pickup, destination);
             var fareEstimates = new List<FareType>();
 
             foreach (VehicleType vehicle in Enum.GetValues(typeof(VehicleType)))

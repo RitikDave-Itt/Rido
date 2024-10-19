@@ -1,4 +1,5 @@
-﻿using Rido.Common.Models.Types;
+﻿using Rido.Common.Models.Responses;
+using Rido.Common.Models.Types;
 using Rido.Data.DTOs;
 using Rido.Data.Entities;
 using System;
@@ -20,5 +21,7 @@ namespace Rido.Services.Interfaces
         Task<bool> CancelRideByDriver(string rideRequestId);
 
         Task<RideRequest> AssignRideDriver(string rideRequestId);
+        Task<RideAndDriverDetailJoin> GetRideAndDriverDetail(string rideRequestId);
+
     }
 }

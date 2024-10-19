@@ -2,7 +2,9 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using AutoMapper.Configuration.Annotations;
 using Rido.Data.Enums;
 
 namespace Rido.Data.Entities
@@ -21,5 +23,9 @@ namespace Rido.Data.Entities
 
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
+
+        [JsonIgnore]
+        [Ignore]
+        public User User { get; set; }
     }
 }

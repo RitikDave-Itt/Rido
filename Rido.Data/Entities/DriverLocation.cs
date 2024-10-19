@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Rido.Data.Enums;
+using AutoMapper.Configuration.Annotations;
+using System.Text.Json.Serialization;
 
 namespace Rido.Data.Entities
 {
@@ -14,7 +16,7 @@ namespace Rido.Data.Entities
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
 
-        public string DriverId { get; set; }
+        public string UserId { get; set; }
 
       
         public string Latitude { get; set; }
@@ -25,5 +27,9 @@ namespace Rido.Data.Entities
         public string Geohash { get; set; }
 
         public VehicleType VehicleType { get; set; }
+
+        [JsonIgnore]
+        [Ignore]
+        public User User { get; set; }
     }
 }

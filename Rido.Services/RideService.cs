@@ -1,59 +1,72 @@
 ﻿using AutoMapper;
-using Geohash;
 using Microsoft.AspNetCore.Http;
-using NetTopologySuite.Geometries;
-using Rido.Data.DTOs;
-using Rido.Data.Entities;
-using Rido.Data.Repositories.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Claims;
-using System.Text;
-using System.Threading.Tasks;
-using Geohash;
 using Rido.Common.Models.Types;
 using Rido.Common.Utils;
+using Rido.Data.DTOs;
+using Rido.Data.Entities;
 using Rido.Data.Enums;
+using Rido.Data.Repositories.Interfaces;
 using Rido.Services.Interfaces;
+using System.Text.RegularExpressions;
 
 namespace Rido.Services
 {
-    public class RideService :BaseService<RideRequest>,IRideService
+    public class RideService : BaseService<RideRequest>, IRideService
     {
 
         private IBaseRepository<DriverLocation> _driverLocationRepository;
         private IMapper _mapper;
+        private IRideRequestRepository _rideRequestRepository;
+        private IBaseRepository<OneTimePassword> _otpRepository;
 
 
-        public RideService(IBaseRepository<DriverLocation> driverLocationRepository, IBaseRepository<RideRequest> rideRequestRepository,IMapper mapper,IHttpContextAccessor httpContextAccessor): base(rideRequestRepository,httpContextAccessor)
+        public RideService(IBaseRepository<OneTimePassword> otpReporitory, IBaseRepository<DriverLocation> driverLocationRepository, IBaseRepository<RideRequest> repository, IMapper mapper, IHttpContextAccessor httpContextAccessor, IRideRequestRepository rideRequestRepository) : base(repository, httpContextAccessor)
         {
             _driverLocationRepository = driverLocationRepository;
             _mapper = mapper;
+            _rideRequestRepository = rideRequestRepository;
+            _otpRepository = otpReporitory;
 
         }
 
 
         public async Task<RideRequest> CreateRideRequest(RideRequestDto rideRequestDto)
         {
-            string currentUserId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            string currentUserId = GetCurrentUserId();
 
             var rideRequest = _mapper.Map<RideRequest>(rideRequestDto);
-            rideRequest.UserId = currentUserId;
-            var createdRideRequestId = await _repository.AddAsync(rideRequest);
+            rideRequest.GeohashCode = GeoHasherUtil.Encoder(new LocationType(rideRequestDto.PickupLatitude, rideRequestDto.PickupLongitude));
+            RideCalculations rideCalculations = new RideCalculations();
+            LocationType destination = new LocationType(rideRequestDto.DestinationLatitude, rideRequestDto.DestinationLongitude);
+            LocationType pickup = new LocationType(rideRequestDto.PickupLatitude, rideRequestDto.PickupLongitude);
 
-            var createdRideRequest = await _repository.GetByIdAsync(createdRideRequestId);
-            
+
+            rideRequest.DistanceInKm = rideCalculations.CalculateDistance(
+               pickup, destination
+            );
+            decimal[] fare = rideCalculations.CalculateFare(rideRequest.DistanceInKm, rideRequest.VehicleType);
+
+            rideRequest.MinPrice = fare[0];
+            rideRequest.MaxPrice = fare[1];
+
+
+
+            rideRequest.UserId = currentUserId;
+            var SavedRideRequest = await _repository.AddAsync(rideRequest);
+
+            var createdRideRequest = await _repository.GetByIdAsync(SavedRideRequest.Id);
+
             return createdRideRequest;
 
         }
-        public async Task<List<RideRequest>> GetRideRequestByLocation(LocationType location)         {
+        public async Task<List<RideRequest>> GetRideRequestByLocation(LocationType location)
+        {
 
             string geohash = GeoHasherUtil.Encoder(location);
-            
 
 
-            IEnumerable<RideRequest> createdRideRequest = await _repository.FindAllAsync(item=>item.GeohashCode==geohash&&item.Status==RideRequestStatus.Requested);
+
+            IEnumerable<RideRequest> createdRideRequest = await _repository.FindAllAsync(item => item.GeohashCode == geohash && item.Status == RideRequestStatus.Requested);
 
             return createdRideRequest.ToList();
 
@@ -91,12 +104,13 @@ namespace Rido.Services
             var rideRequest = await _repository.GetByIdAsync(rideRequestId);
 
             rideRequest.DriverId = currentUserId;
+            rideRequest.Status = RideRequestStatus.Accepted;
 
             bool updateResult = await _repository.UpdateAsync(rideRequest);
 
             if (updateResult)
             {
-            return rideRequest;
+                return rideRequest;
 
             }
             else
@@ -109,14 +123,20 @@ namespace Rido.Services
 
         }
 
-        public async Task<RideRequest> GetRideAndDriverDetail(string rideRequestId)
+        public async Task<RideAndDriverDetailJoin> GetRideAndDriverDetail(string rideRequestId)
         {
+            var result = await _rideRequestRepository.GetRideAndDriverDetailsByIdAsync(rideRequestId);
 
+            
 
+            if (result != null)
+            {
+                result.OTP = StringUtils.ExtractDigits(result.RideRequestId);
+            }
 
-
-
+            return result;
         }
+
 
 
     }

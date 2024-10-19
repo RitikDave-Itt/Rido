@@ -16,13 +16,12 @@ namespace Rido.Data.Repositories
             _context = context;
         }
 
-        public async Task<string> AddAsync(T entity)
+        public async Task<T> AddAsync(T entity)
         {
             await _context.Set<T>().AddAsync(entity);
             await _context.SaveChangesAsync();
 
-            var propertyInfo = typeof(T).GetProperty("Id");
-            return propertyInfo.GetValue(entity) as string;
+            return entity;     
         }
 
 
@@ -62,10 +61,7 @@ namespace Rido.Data.Repositories
             return await _context.Set<T>().FirstAsync(predicate);
         }
 
-        public async Task<T> FindFirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _context.Set<T>().FirstOrDefaultAsync(predicate);
-        }
+     
 
         public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, bool>> predicate)
         {

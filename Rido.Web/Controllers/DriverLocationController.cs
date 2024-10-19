@@ -14,7 +14,7 @@ namespace Rido.Web.Controllers
 {
     [Authorize(Roles = "Driver")]
     [ApiController]
-    [Route("/api/[controller]")]
+    [Route("/api/driver-location")]
     public class DriverLocationController : ControllerBase
     {
         private readonly IDriverLocationService _driverLocationService;

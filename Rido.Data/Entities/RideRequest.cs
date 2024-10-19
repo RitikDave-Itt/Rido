@@ -34,6 +34,12 @@ namespace Rido.Data.Entities
             public RideRequestStatus Status { get; set; } = RideRequestStatus.Requested;
 
 
+        public User User { get; set; }
+        public User Driver { get; set; }
+
+        public OneTimePassword OneTimePassword {  get; set; }
+
+
 
 
     }

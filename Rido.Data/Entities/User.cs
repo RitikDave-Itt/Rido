@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Text.Json.Serialization;
+using AutoMapper.Configuration.Annotations;
 using Rido.Data.Enums;
 
 namespace Rido.Data.Entities
@@ -18,7 +20,18 @@ namespace Rido.Data.Entities
         public UserStatus Status { get; set; }
         public string ProfileImageUrl { get; set; }
         public string PasswordHash { get; set; }
-        public UserRole Role { get; set; }    
+        public UserRole Role { get; set; }
+
+        [JsonIgnore]
+        [Ignore]
+        public DriverData DriverData { get; set; }
+        [JsonIgnore]
+        [Ignore]
+        public DriverLocation DriverLocation { get; set; }
+
+        [JsonIgnore]
+        [Ignore]
+        public Wallet Wallet { get; set; }
 
 
     }

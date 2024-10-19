@@ -16,6 +16,8 @@ namespace Rido.Web
 
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped(typeof(IBaseRepository<>), typeof(BaseRepository<>));
+            services.AddScoped<IRideRequestRepository, RideRequestRepository>();
+
         }
     }
 }

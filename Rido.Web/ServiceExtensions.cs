@@ -3,6 +3,8 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Rido.Common.Mappings;
 using Rido.Common.Secrets;
+using Rido.Data.Repositories.Interfaces;
+using Rido.Data.Repositories;
 using Rido.Services;
 using Rido.Services.Interfaces;
 using System.Reflection;
@@ -22,18 +24,8 @@ namespace Rido.Web
             services.AddScoped<IDriverLocationService, DriverLocationService>();
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<LocationUtils>();
-
-
-
-
+            services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
             services.AddScoped<RideService>();
-
-
-
-            services.AddAutoMapper(typeof(UserProfile));
-            services.AddHttpContextAccessor();
-
-
             services.AddControllers();
             services.AddEndpointsApiExplorer();
             services.AddSwaggerGen(c =>

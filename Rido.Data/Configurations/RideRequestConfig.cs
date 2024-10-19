@@ -78,6 +78,17 @@ namespace Rido.Data.Configurations
             builder.Property(rr => rr.Status)
                   .IsRequired()
                   .HasConversion<int>();
+
+            builder.HasOne(rr => rr.User)
+                .WithOne()
+                .HasForeignKey<RideRequest>(rr => rr.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasOne(rr => rr.Driver)
+                .WithOne()
+                .HasForeignKey<RideRequest>(rr => rr.DriverId)
+                .OnDelete(DeleteBehavior.Restrict);
+                
         }
     }
 }
