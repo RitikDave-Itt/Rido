@@ -14,7 +14,14 @@ namespace Rido.Data.Configurations
                 .IsRequired();
 
             builder.Property(rb => rb.DriverId)
-                .IsRequired();       
+                .IsRequired();
+
+            builder.Property(rb => rb.TransactionId)
+               .IsRequired();
+
+            builder.HasIndex(rb => rb.UserId);
+            builder.HasIndex(rb => rb.DriverId);
+
 
             builder.Property(rb => rb.PickupTime)
                 .IsRequired();
@@ -57,7 +64,7 @@ namespace Rido.Data.Configurations
             builder.HasOne(rb=>rb.User)        
                 .WithMany()     
                 .HasForeignKey(rb => rb.UserId)
-                .OnDelete(DeleteBehavior.Cascade);       
+                .OnDelete(DeleteBehavior.NoAction);       
 
             builder.HasOne(rb=>rb.Driver)        
                 .WithMany()     

@@ -24,10 +24,8 @@ namespace Rido.Data.Contexts
 
         public DbSet<Entities.RideBooking> RideBookings { get; set; }
         public DbSet<Entities.RideReview> RideReviews { get; set; }
-
-
-
-
+        public DbSet<Entities.WalletTransaction> WalletTransactions { get; set; }
+        public DbSet<Entities.RefreshToken> RefreshTokens { get; set; }
 
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -42,11 +40,8 @@ namespace Rido.Data.Contexts
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.RideTransaction>)new Configurations.RideTransactionConfig());
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.RideBooking>)new Configurations.RideBookingConfig());
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.RideReview>)new Configurations.RideReviewConfig());
-
-
-
-
-
+            modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.WalletTransaction>)new Configurations.WalletTransactionConfig());
+            modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.RefreshToken>)new Configurations.RefreshTokenConfig());
 
 
 

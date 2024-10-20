@@ -3,8 +3,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
-using Rido.Common.Models.Types;
+using Rido.Common.Exceptions;
 using Rido.Common.Utils;
+using Rido.Data.DataTypes;
 using Rido.Data.DTOs;
 using Rido.Services;
 using Rido.Services.Interfaces;
@@ -100,7 +101,7 @@ namespace Rido.Web.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while  ride requests by location.");
+                _logger.LogError(ex, " error occurred while  ride requests by location.");
                 return StatusCode(500, "Internal server error.");
             }
         }
@@ -175,10 +176,17 @@ namespace Rido.Web.Controllers
                 }
                 else
                 {
-                    return StatusCode(460,"Driver is Not Assigned");
+                    return NotFound(new {Message = "Ride Not Found Invalid Id"});
                 }
 
             }
+            catch(DriverNotAssignedException ex)
+            {
+                return StatusCode(460, new { Message = ex.Message });
+
+
+            }
+
             catch (Exception ex)
             {
                 _logger.LogError(ex, " error  while retrieving ride and driver details.");

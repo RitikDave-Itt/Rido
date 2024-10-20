@@ -34,13 +34,11 @@ namespace Rido.Data.Repositories
 
                     }
                     wallet.UserId = savedUser.Entity.Id;       
-
                     var saveWallet = await _dbContext.Wallets.AddAsync(wallet);
                     await _dbContext.SaveChangesAsync();
 
                     await transaction.CommitAsync();
                     return savedUser.Entity.Id;
-
 
                 }
                 catch (Exception ex) {

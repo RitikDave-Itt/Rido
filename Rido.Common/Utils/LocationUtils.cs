@@ -3,8 +3,8 @@ using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
 using Rido.Common.Models.Requests;
 using Rido.Common.Models.Responses;
-using Rido.Common.Models.Types;
 using Rido.Common.Secrets;
+using Rido.Data.DataTypes;
 
 
 namespace Rido.Services

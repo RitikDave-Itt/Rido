@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Rido.Data.DataTypes;
 
 using Geohash;
-using Rido.Common.Models.Types;
 
 namespace Rido.Common.Utils
 {

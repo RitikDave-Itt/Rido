@@ -71,8 +71,31 @@ namespace Rido.Data.Repositories
             var query = ApplyIncludes(_context.Set<T>().Where(predicate), includes);
             return await query.ToListAsync();
         }
+        public async Task<(IEnumerable<T> Items,int TotalCount)> FindPageAsync(
+            Expression<Func<T, bool>> predicate,
+            int pageSige ,
+            int pageNo,
+    List<Func<IQueryable<T>, IOrderedQueryable<T>>> orderBys = null
+            , params Expression<Func<T, object>>[] includes)
+        {
+            var query = ApplyIncludes(_context.Set<T>().Where(predicate), includes);
+            if (orderBys != null && orderBys.Count > 0)
+            {
+                foreach (var orderBy in orderBys)
+                {
+                    query = orderBy(query);
+                }
+            }
 
-        
+            int totalCount = await query.CountAsync();
+
+            var items = await query.Skip((pageNo - 1) * pageSige)
+                                   .Take(pageSige)
+                                   .ToListAsync();
+
+            return (items, totalCount);
+        }
+
 
         private IQueryable<T> ApplyIncludes(IQueryable<T> query, params Expression<Func<T, object>>[] includes)
         {

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Rido.Common.Models.Types
+namespace Rido.Data.DataTypes
 {
     public class AddressType
     {

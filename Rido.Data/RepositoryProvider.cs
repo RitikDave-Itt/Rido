@@ -19,6 +19,8 @@ namespace Rido.Data
             //services.AddScoped<IRideRequestRepository, RideRequestRepository>();
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IRideTransactionRepository, RideTransactionRepository>();
+            services.AddScoped<IWalletTransactionRepository, WalletTransactionRepository>();
+
 
 
 

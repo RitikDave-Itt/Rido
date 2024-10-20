@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Rido.Common.Models.Requests;
 using Rido.Common.Models.Responses;
-using Rido.Common.Models.Types;
+using Rido.Data.DataTypes;
 using Rido.Services;
 using Rido.Services.Interfaces;
 using System.Collections.Generic;

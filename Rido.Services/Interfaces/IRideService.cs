@@ -1,5 +1,5 @@
 ﻿using Rido.Common.Models.Responses;
-using Rido.Common.Models.Types;
+using Rido.Data.DataTypes;
 using Rido.Data.DTOs;
 using Rido.Data.Entities;
 using System;

@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Geohash;
 using Microsoft.AspNetCore.Http;
-using Rido.Common.Models.Types;
+using Rido.Data.DataTypes;
 using Rido.Data.Entities;
 using Rido.Data.Enums;
 using Rido.Data.Repositories.Interfaces;
@@ -14,7 +14,7 @@ using Rido.Services.Interfaces;
 
 namespace Rido.Services
 {
-    public class DriverLocationService : IDriverLocationService
+    public class DriverLocationService : IDriverLocationService 
     {
         private IBaseRepository<DriverLocation> _repository;
         private readonly IHttpContextAccessor _httpContextAccessor;

@@ -110,7 +110,7 @@ namespace Rido.Web.Controllers
         [Authorize(Roles = "Driver")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto verifyOtpDto)
         {
-            bool verified =await  _authService.VerifyOTP(verifyOtpDto.Otp,verifyOtpDto.RideRequestId);
+            bool verified =  _authService.VerifyOTP(verifyOtpDto.Otp,verifyOtpDto.RideRequestId);
 
             if (verified)
             {
@@ -127,6 +127,40 @@ namespace Rido.Web.Controllers
             }
         }
 
+
+        [HttpPost("refresh-token")]
+        public async Task<IActionResult> RefreshAndVerifyToken()
+        {
+            try {
+                var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
+
+                if (authHeader == null)
+                {
+                    return Unauthorized("Refresh Token Not Found");
+                }
+                var refreshToken = authHeader.Substring("Bearer ".Length).Trim();
+
+                var (IsValid,RefreshToken,JwtToken) = await _authService.VerifyAndGenerateRefreshToken(refreshToken);
+
+                if (!IsValid) {
+                    return Unauthorized("Refresh Token Expired Or Not Found");
+
+                }
+
+                return Ok(new {IsValid,RefreshToken,JwtToken});
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "EXCEPTION IN REFRESH TOKEN");
+                return BadRequest(ex);
+
+            }
+
+
+
+
+
+        }
 
 
     }

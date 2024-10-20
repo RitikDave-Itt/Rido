@@ -7,6 +7,7 @@ using Microsoft.IdentityModel.Tokens;
 using Rido.Data.Enums;
 
 using Rido.Common.Secrets;
+using Rido.Data.Entities;
 
 namespace Rido.Services
 {
@@ -42,5 +43,19 @@ namespace Rido.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
+        public RefreshToken GenerateRefreshToken()
+        {
+            var refreshToken = new RefreshToken
+            {
+                Token = Guid.NewGuid().ToString(),     
+                Expiry = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpiryInDays),       
+                IsRevoked = false,
+            };
+
+            return refreshToken;
+        }
+
+
     }
+
 }

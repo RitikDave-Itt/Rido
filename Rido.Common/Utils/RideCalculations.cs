@@ -1,4 +1,4 @@
-﻿using Rido.Common.Models.Types;
+﻿using Rido.Data.DataTypes;
 using Rido.Data.Enums;
 using System;
 using System.Collections.Generic;

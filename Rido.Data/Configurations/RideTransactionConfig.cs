@@ -11,10 +11,10 @@ namespace Rido.Data.Configurations
             builder.HasKey(rt => rt.Id);
 
             builder.Property(rt => rt.UserId)
-                .IsRequired();    
+                .IsRequired();
 
             builder.Property(rt => rt.DriverId)
-                .IsRequired(false);    
+                .IsRequired();    
 
             builder.Property(rt => rt.Amount)
                 .HasColumnType("decimal(18,2)")

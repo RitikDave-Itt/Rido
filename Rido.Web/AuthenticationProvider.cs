@@ -4,37 +4,47 @@ using Rido.Common.Secrets;
 using Rido.Services;
 using System.Text;
 
-namespace Rido.Web
+public static class AuthenticationProvider
 {
-    public static  class AuthenticationProvider
+    public static void ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
-        public static void ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
+        services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
+        services.AddScoped<JwtUtil>();     
+
+        var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
+        var key = Encoding.UTF8.GetBytes(jwtSettings.Secret);
+
+        services.AddAuthentication(options =>
         {
-            services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
-            services.AddScoped<JwtUtil>();
-            var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
-            var key = Encoding.UTF8.GetBytes(jwtSettings.Secret);
+            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        })
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,     
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = jwtSettings.Issuer,
+                ValidAudience = jwtSettings.Audience,
+                IssuerSigningKey = new SymmetricSecurityKey(key)
+            };
 
-            services.AddAuthentication(options =>
+            options.Events = new JwtBearerEvents
             {
-                options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            })
-            .AddJwtBearer(options =>
-            {
-                options.TokenValidationParameters = new TokenValidationParameters
+                OnAuthenticationFailed = context =>
                 {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidateIssuerSigningKey = true,
-                    ValidIssuer = jwtSettings.Issuer,
-                    ValidAudience = jwtSettings.Audience,
-                    IssuerSigningKey = new SymmetricSecurityKey(key)
-                };
-            });
+                    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                    {
+                        context.Response.Headers.Add("Token-Expired", "true");
+                    }
+                    return Task.CompletedTask;
+                }
+            };
+        });
 
-            services.AddAuthorization();
-        }
+        services.AddAuthorization();
     }
 }

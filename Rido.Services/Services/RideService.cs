@@ -1,7 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Rido.Common.Models.Types;
+using Rido.Common.Exceptions;
 using Rido.Common.Utils;
+using Rido.Data.DataTypes;
 using Rido.Data.DTOs;
 using Rido.Data.Entities;
 using Rido.Data.Enums;
@@ -120,10 +121,21 @@ namespace Rido.Services
 
         public async Task<dynamic> GetRideAndDriverDetail(string rideRequestId)
         {
-            var result = await _rideRequestRepository.FindFirstAsync(r=>r.Id==rideRequestId,r=>r.Driver, result=>result.Driver.location,r=>r.Driver.DriverData);
+            var result = await _rideRequestRepository.FindAsync(r=>r.Id==rideRequestId,r=>r.Driver, result=>result.Driver.location,r=>r.Driver.DriverData);
+
+            if (result == null)
+            {
+                return null;
+            }
+
+            if (result.DriverId == null)
+            {
+                return new { DriverAssigned = false,Massage = "Driver Not Assigned Yet" };
+            }
 
             var response = new
             {
+                DriverAssigned = true,
                 Id = rideRequestId,
                 DriverName = result.Driver.FirstName + " " + result.Driver.LastName,
                 MobileNo = result.Driver.PhoneNumber,
@@ -131,10 +143,6 @@ namespace Rido.Services
                 Latitude = result?.Driver?.location?.Latitude?.ToString(),
                 Longitude = result?.Driver?.location?.Longitude?.ToString(),
                 Otp = OtpUtils.GenerateOtp(rideRequestId)
-
-
-
-
 
 
 

@@ -1,5 +1,5 @@
 ﻿using Newtonsoft.Json.Linq;
-using Rido.Common.Models.Types;
+using Rido.Data.DataTypes;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,0 +1,24 @@
+﻿using Rido.Data.Enums;
+using System;
+
+namespace Rido.Data.Entities
+{
+    public class WalletTransaction
+    {
+        public string Id { get; set; } = Guid.NewGuid().ToString();      
+        public string UserId { get; set; }          
+        public decimal Amount { get; set; }      
+        public WalletTransactionType Type { get; set; }
+        public WalletTransactionStatus Status { get; set; } = WalletTransactionStatus.Completed;        
+        public DateTime CreatedAt { get; set; } = DateTime.Now;        
+        public DateTime? UpdatedAt { get; set; }
+
+        public string RazorPayId { get; set; } = null;
+
+        public string Remarks { get; set; }       
+
+        public User User { get; set; }
+    }
+
+  
+}

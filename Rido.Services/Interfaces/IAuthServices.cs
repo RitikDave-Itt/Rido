@@ -13,7 +13,8 @@ namespace Rido.Services.Interfaces
         public Task<LoginResponse> LoginUserAsync(LoginUserDto loginUserDto);
         public Task<string> RegisterUserAsync(RegisterUserDto userDto ,RegisterDriverDto driverDto);
 
-        public Task<bool> VerifyOTP(string otp, string rideRequestId);
+        public bool VerifyOTP(string otp, string rideRequestId);
+        Task<(bool IsValid, string? RefreshToken, string? JwtToken)> VerifyAndGenerateRefreshToken(string token);
 
 
     }
