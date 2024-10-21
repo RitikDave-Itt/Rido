@@ -27,6 +27,8 @@ namespace Rido.Data.Contexts
         public DbSet<Entities.WalletTransaction> WalletTransactions { get; set; }
         public DbSet<Entities.RefreshToken> RefreshTokens { get; set; }
 
+        public DbSet<Entities.Image> Images { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -42,6 +44,8 @@ namespace Rido.Data.Contexts
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.RideReview>)new Configurations.RideReviewConfig());
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.WalletTransaction>)new Configurations.WalletTransactionConfig());
             modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.RefreshToken>)new Configurations.RefreshTokenConfig());
+            modelBuilder.ApplyConfiguration((IEntityTypeConfiguration<Entities.Image>)new Configurations.ImageConfig());
+
 
 
 

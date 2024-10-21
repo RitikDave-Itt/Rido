@@ -106,6 +106,35 @@ namespace Rido.Data.Migrations
                     b.ToTable("DriverLocations", (string)null);
                 });
 
+            modelBuilder.Entity("Rido.Data.Entities.Image", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Base64String")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime2")
+                        .HasDefaultValueSql("GETDATE()");
+
+                    b.Property<string>("FileNAme")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("FileType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FileType");
+
+                    b.ToTable("Images", (string)null);
+                });
+
             modelBuilder.Entity("Rido.Data.Entities.RefreshToken", b =>
                 {
                     b.Property<string>("Id")
@@ -167,7 +196,6 @@ namespace Rido.Data.Migrations
                         .HasColumnType("float");
 
                     b.Property<string>("DriverId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("DropoffTime")
@@ -192,7 +220,6 @@ namespace Rido.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -201,7 +228,6 @@ namespace Rido.Data.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("VehicleType")
@@ -212,7 +238,8 @@ namespace Rido.Data.Migrations
                     b.HasIndex("DriverId");
 
                     b.HasIndex("TransactionId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[TransactionId] IS NOT NULL");
 
                     b.HasIndex("UserId");
 
@@ -345,7 +372,6 @@ namespace Rido.Data.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.Property<string>("DriverId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Remarks")
@@ -355,7 +381,6 @@ namespace Rido.Data.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
@@ -403,9 +428,8 @@ namespace Rido.Data.Migrations
                         .HasMaxLength(15)
                         .HasColumnType("nvarchar(15)");
 
-                    b.Property<string>("ProfileImageUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                    b.Property<string>("ProfileImageId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<int>("Role")
                         .ValueGeneratedOnAdd()
@@ -423,6 +447,10 @@ namespace Rido.Data.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ProfileImageId")
+                        .IsUnique()
+                        .HasFilter("[ProfileImageId] IS NOT NULL");
 
                     b.ToTable("Users", (string)null);
                 });
@@ -531,20 +559,17 @@ namespace Rido.Data.Migrations
                     b.HasOne("Rido.Data.Entities.User", "Driver")
                         .WithMany()
                         .HasForeignKey("DriverId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Rido.Data.Entities.RideTransaction", "RideTransaction")
                         .WithOne()
                         .HasForeignKey("Rido.Data.Entities.RideBooking", "TransactionId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Rido.Data.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Driver");
 
@@ -603,18 +628,26 @@ namespace Rido.Data.Migrations
                     b.HasOne("Rido.Data.Entities.User", "Driver")
                         .WithMany()
                         .HasForeignKey("DriverId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Rido.Data.Entities.User", "Rider")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Driver");
 
                     b.Navigation("Rider");
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.User", b =>
+                {
+                    b.HasOne("Rido.Data.Entities.Image", "ProfileImage")
+                        .WithOne()
+                        .HasForeignKey("Rido.Data.Entities.User", "ProfileImageId")
+                        .OnDelete(DeleteBehavior.Cascade);
+
+                    b.Navigation("ProfileImage");
                 });
 
             modelBuilder.Entity("Rido.Data.Entities.Wallet", b =>

@@ -18,7 +18,7 @@ namespace Rido.Data.Entities
         public DateTime UpdatedAt { get; set; }
 
         public UserStatus Status { get; set; }
-        public string ProfileImageUrl { get; set; }
+        public string ProfileImageId { get; set; }
         public string PasswordHash { get; set; }
         public UserRole Role { get; set; }
 
@@ -30,6 +30,7 @@ namespace Rido.Data.Entities
 
         public DriverLocation? location { get; set; } = null;
 
+        public Image ProfileImage { get; set; } = null;
        
 
     }

@@ -10,6 +10,8 @@ namespace Rido.Common.Exceptions
     {
         public DriverNotAssignedException() { }
 
-        public DriverNotAssignedException(string message) : base(message) { }
+        public DriverNotAssignedException(string message) : base(message) {
+        
+        }
     }
 }

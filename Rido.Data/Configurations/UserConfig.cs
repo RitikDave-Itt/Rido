@@ -45,14 +45,18 @@ namespace Rido.Data.Configurations
                 .IsRequired()
                 .HasDefaultValue(UserStatus.Active);      
 
-            builder.Property(p => p.ProfileImageUrl)
-                .HasMaxLength(500)
+            builder.Property(p => p.ProfileImageId)
                 .IsRequired(false);
 
             builder.Property(p => p.Role)
                 .IsRequired()
                 .HasConversion<int>()
                 .HasDefaultValue(UserRole.User);
+
+            builder.HasOne(u=>u.ProfileImage)
+                .WithOne()
+                .HasForeignKey<User>(u=>u.ProfileImageId)
+                .OnDelete(DeleteBehavior.Cascade);
 
            
 

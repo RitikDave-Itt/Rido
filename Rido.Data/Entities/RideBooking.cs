@@ -14,8 +14,8 @@ namespace Rido.Data.Entities
 
         public string Id { get; set; } = Guid.NewGuid().ToString();
 
-        public string UserId { get; set; }
-        public string DriverId { get; set; }
+        public string? UserId { get; set; }
+        public string? DriverId { get; set; }
 
         public DateTime PickupTime { get; set; }
         public DateTime DropoffTime { get; set; }
@@ -45,10 +45,10 @@ namespace Rido.Data.Entities
         public DateTime UpdatedAt { get; set; } = DateTime.Now;
 
 
-        public User User { get; set; }
-        public User Driver { get; set; }
+        public User? User { get; set; }
+        public User? Driver { get; set; }
 
-        public RideTransaction RideTransaction { get; set; }
+        public RideTransaction? RideTransaction { get; set; }
         
 
     }

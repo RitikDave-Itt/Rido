@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
+using Rido.Common.Secrets;
 using Rido.Common.Utils;
 using Rido.Services;
 
@@ -11,9 +12,11 @@ namespace Rido.Web
             services.AddHttpClient<LocationUtils>("location",
                 client =>{
                 client.BaseAddress = new Uri("https://us1.locationiq.com/v1/");
-                    var apiKey = configuration["LocationIQ:ApiKey"];
-                    client.DefaultRequestHeaders.Add("Authorization", $"Bearer {apiKey}");
+                 
                 });
+
+            services.Configure<LocationSecrets>(configuration.GetSection("LocationIQ"));
+
         }
     }
 }

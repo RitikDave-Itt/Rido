@@ -129,7 +129,7 @@ namespace Rido.Web.Controllers
                 }
                 else if (verify == OTPVerificationStatus.InvalidOTP)
                 {
-                    return Unauthorized(new { success = false, Message = "Invalid ride Request" });
+                    return Unauthorized(new { success = false, Message = "Invalid OTP " });
 
                 }
                 else

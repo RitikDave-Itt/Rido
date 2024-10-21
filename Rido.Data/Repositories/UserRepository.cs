@@ -26,7 +26,7 @@ namespace Rido.Data.Repositories
             {
                 try
                 {
-                    var savedUser = await _dbContext.Users.AddAsync(user);
+                    var savedUser = await _dbContext.Users.AddAsync(user);       
                     if (user.Role == UserRole.Driver)
                     {
                         driver.UserId = savedUser.Entity.Id;

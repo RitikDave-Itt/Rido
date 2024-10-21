@@ -11,16 +11,16 @@ namespace Rido.Data.Configurations
             builder.HasKey(rb => rb.Id);
 
             builder.Property(rb => rb.UserId)
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(rb => rb.DriverId)
-                .IsRequired();
+                .IsRequired(false);
 
             builder.Property(rb => rb.TransactionId)
-               .IsRequired();
+               .IsRequired(false);
 
-            builder.HasIndex(rb => rb.UserId);
-            builder.HasIndex(rb => rb.DriverId);
+            builder.HasIndex(rb => rb.UserId).IsUnique(false);
+            builder.HasIndex(rb => rb.DriverId).IsUnique(false);
 
 
             builder.Property(rb => rb.PickupTime)
