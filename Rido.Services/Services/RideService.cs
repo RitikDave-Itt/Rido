@@ -85,6 +85,7 @@ namespace Rido.Services
 
             var rideRequest = await _repository.GetByIdAsync(rideRequestId);
             rideRequest.Status = RideRequestStatus.Requested;
+            rideRequest.DriverId = null;
 
             bool result = await _repository.UpdateAsync(rideRequest);
 
@@ -99,20 +100,18 @@ namespace Rido.Services
 
             var rideRequest = await _repository.GetByIdAsync(rideRequestId);
 
+            if(rideRequest.DriverId != null || rideRequest.Status != RideRequestStatus.Requested)
+            {
+                return null;
+            }
+
             rideRequest.DriverId = currentUserId;
             rideRequest.Status = RideRequestStatus.Accepted;
 
             bool updateResult = await _repository.UpdateAsync(rideRequest);
+            return rideRequest;
 
-            if (updateResult)
-            {
-                return rideRequest;
-
-            }
-            else
-            {
-                return null;
-            }
+           
 
 
 
@@ -121,14 +120,14 @@ namespace Rido.Services
 
         public async Task<dynamic> GetRideAndDriverDetail(string rideRequestId)
         {
-            var result = await _rideRequestRepository.FindAsync(r=>r.Id==rideRequestId,r=>r.Driver, result=>result.Driver.location,r=>r.Driver.DriverData);
+            var result = await _rideRequestRepository.FindAsync(r=>r.Id==rideRequestId, result=>result.Driver.location,r=>r.Driver.DriverData);
 
             if (result == null)
             {
                 return null;
             }
 
-            if (result.DriverId == null)
+            if (result.DriverId == null&&result.Status == RideRequestStatus.Requested)
             {
                 return new { DriverAssigned = false,Massage = "Driver Not Assigned Yet" };
             }

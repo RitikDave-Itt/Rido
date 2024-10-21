@@ -110,20 +110,37 @@ namespace Rido.Web.Controllers
         [Authorize(Roles = "Driver")]
         public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto verifyOtpDto)
         {
-            bool verified =  _authService.VerifyOTP(verifyOtpDto.Otp,verifyOtpDto.RideRequestId);
-
-            if (verified)
+            try
             {
-                var rideRequest = await _rideRequestService.GetByIdAsync(verifyOtpDto.RideRequestId);
-                rideRequest.Status = RideRequestStatus.InProgress;
-                var updateRideRequest = await _rideRequestService.UpdateAsync(rideRequest);
+                var verify = await _authService.VerifyOTP(verifyOtpDto.Otp, verifyOtpDto.RideRequestId);
 
-                return Ok(new { Success = true });
+                if (verify == OTPVerificationStatus.Success)
+                {
+                    var rideRequest = await _rideRequestService.GetByIdAsync(verifyOtpDto.RideRequestId);
+                    rideRequest.Status = RideRequestStatus.InProgress;
+                    var updateRideRequest = await _rideRequestService.UpdateAsync(rideRequest);
 
+                    return Ok(new { Success = true });
+
+                }
+                else if (verify == OTPVerificationStatus.InvalidRideRequestStatus)
+                {
+                    return NotFound(new { success = false, Message = "Invalid ride Request" });
+                }
+                else if (verify == OTPVerificationStatus.InvalidOTP)
+                {
+                    return Unauthorized(new { success = false, Message = "Invalid ride Request" });
+
+                }
+                else
+                {
+                    return BadRequest();
+                }
             }
-            else
-            {
-                return StatusCode(401, new { Message = "Otp Not Matched" });
+            catch (Exception ex) {
+
+                _logger.LogError(ex, "Something Went Wrong in Otp Verification");
+                return BadRequest();
             }
         }
 

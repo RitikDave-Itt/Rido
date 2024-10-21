@@ -15,12 +15,14 @@ using Microsoft.Extensions.Options;
 
 namespace Rido.Services
 {
-    public class AuthService : BaseService<User>,IAuthServices
+    public class AuthService : BaseService<User>, IAuthServices
     {
         private readonly IBaseRepository<DriverData> _driverRepository;
         private readonly IUserRepository _userRepository;
         private readonly IBaseRepository<RefreshToken> _refreshTokenRepository;
         private readonly IBaseRepository<User> _userBaseRepository;
+        private readonly IBaseRepository<RideRequest> _rideRequestRepository;
+
 
 
 
@@ -31,13 +33,14 @@ namespace Rido.Services
 
 
         public AuthService(IBaseRepository<DriverData> driverRepository
-            ,JwtUtil jwtService,IServiceProvider serviceProvider
-            ,IUserRepository userRepository
+            , JwtUtil jwtService, IServiceProvider serviceProvider
+            , IUserRepository userRepository
             , IOptions<JwtSettings> jwtSettings
             , IBaseRepository<User> userBaseRepository
-            , IBaseRepository<RefreshToken> refreshTokenRepository)
-            
-            :base(serviceProvider)
+            , IBaseRepository<RefreshToken> refreshTokenRepository
+            , IBaseRepository<RideRequest> rideRequestRepository)
+
+            : base(serviceProvider)
         {
             _jwtService = jwtService;
             _driverRepository = driverRepository;
@@ -45,6 +48,7 @@ namespace Rido.Services
             _refreshTokenRepository = refreshTokenRepository;
             _jwtSettings = jwtSettings.Value;
             _userBaseRepository = userBaseRepository;
+            _rideRequestRepository = rideRequestRepository;
 
 
         }
@@ -70,7 +74,7 @@ namespace Rido.Services
                     UserId = user.Id,
                     Expiry = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpiryInDays)
                 };
-               var result= await _refreshTokenRepository.AddAsync(refreshToken);
+                var result = await _refreshTokenRepository.AddAsync(refreshToken);
                 refreshToken = result;
             }
             else
@@ -85,7 +89,7 @@ namespace Rido.Services
                     throw new Exception("Unable to update Refresh Token");
                 }
 
-                refreshToken = existingRefreshToken;       
+                refreshToken = existingRefreshToken;
             }
 
             return new LoginResponse
@@ -97,15 +101,15 @@ namespace Rido.Services
         }
 
 
-        public async Task<string> RegisterUserAsync(RegisterUserDto userDto,RegisterDriverDto driverDto = null)
+        public async Task<string> RegisterUserAsync(RegisterUserDto userDto, RegisterDriverDto driverDto = null)
         {
 
             userDto.PasswordHash = PasswordHasher.HashPassword(userDto.PasswordHash);
             var user = _mapper.Map<User>(userDto);
 
             DriverData driver = new DriverData();
-            if (driverDto != null) { 
-            driver = _mapper.Map<DriverData>(driverDto);
+            if (driverDto != null) {
+                driver = _mapper.Map<DriverData>(driverDto);
 
             }
             else
@@ -120,17 +124,40 @@ namespace Rido.Services
                 WalletStatus = WalletStatus.Active
             };
 
-            var registeredUser = await _userRepository.CreateUser(user, wallet,driver);
+            var registeredUser = await _userRepository.CreateUser(user, wallet, driver);
 
 
 
-            return  registeredUser;
+            return registeredUser;
         }
 
-        public  bool VerifyOTP(string otp, string rideRequestId)
+        public async Task<OTPVerificationStatus> VerifyOTP(string otp, string rideRequestId)
         {
-           
-         return OtpUtils.MatchOTP(rideRequestId, otp);
+            var UserId = GetCurrentUserId();
+            bool otpVerify = OtpUtils.MatchOTP(rideRequestId, otp);
+
+
+            if (!otpVerify) { 
+
+
+                return OTPVerificationStatus.InvalidOTP;
+            
+            }
+
+            var rideRequest  = await _rideRequestRepository.GetByIdAsync(rideRequestId);
+
+            if (rideRequest == null||rideRequest.Status!=RideRequestStatus.Accepted||rideRequest.DriverId!=UserId) {
+                return OTPVerificationStatus.InvalidRideRequestStatus;
+            }
+
+            rideRequest.Status = RideRequestStatus.Started; 
+
+            var update = await _rideRequestRepository.UpdateAsync(rideRequest);
+
+                   
+
+
+         return  OTPVerificationStatus.Success;
         }
 
 

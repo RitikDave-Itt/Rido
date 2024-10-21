@@ -9,7 +9,7 @@ namespace Rido.Data.Enums
     public enum RideRequestStatus
     {
         Requested,              
-        Pending,                 
+        Started,                 
         Accepted,               
         InProgress,            
         Completed,            

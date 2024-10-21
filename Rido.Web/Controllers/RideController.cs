@@ -134,7 +134,7 @@ namespace Rido.Web.Controllers
                 var result = await _rideService.CancelRideByDriver(rideRequestId);
                 if (result)
                 {
-                    return NoContent();
+                    return Ok(new {success=true,Message = "Ride Cancelled Successfully" });
                 }
                 return NotFound("Ride request Not found or could not be canceled.");
             }
