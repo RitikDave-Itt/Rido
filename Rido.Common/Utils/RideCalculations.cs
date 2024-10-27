@@ -1,4 +1,5 @@
-﻿using Rido.Data.DataTypes;
+﻿using Rido.Common.Models.Responses;
+using Rido.Data.DataTypes;
 using Rido.Data.Enums;
 using System;
 using System.Collections.Generic;
@@ -10,17 +11,17 @@ namespace Rido.Common.Utils
 {
     public class RideCalculations
     {
-        private const int SedanRatePerKm = 15;       
-        private const int SuvRatePerKm = 18;         
-        private const int CoupeRatePerKm = 13;       
-        private const int VanRatePerKm = 15;         
-        private const int AutoRikshawRatePerKm = 10;        
-        private const int MotorcycleRatePerKm = 8;       
-        private const int OtherRatePerKm = 15;
+        private const double SedanRatePerKm = 15;       
+        private const double SuvRatePerKm = 18;         
+        private const double CoupeRatePerKm = 13;       
+        private const double VanRatePerKm = 15;         
+        private const double AutoRikshawRatePerKm = 10;        
+        private const double BikeRatePerKm = 8;       
+        private const double OtherRatePerKm = 15;
 
         public double CalculateDistance(LocationType pickup , LocationType destinition)
         {
-            const double EarthRadius = 6371.0; 
+            const double EarthRadius = 6371.0f; 
 
             double lat1 = Convert.ToDouble(pickup.Latitude);
             double lon1 = Convert.ToDouble(pickup.Longitude);
@@ -37,33 +38,65 @@ namespace Rido.Common.Utils
                 Math.Sin(dLon / 2) * Math.Sin(dLon / 2);
             double c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
 
-            return EarthRadius * c;    
+            return EarthRadius * (double) c;    
         }
 
-        public decimal[] CalculateFare(double distanceInKm, VehicleType vehicle)
+        public double[] CalculateFare(double distanceInKm, VehicleType vehicle)
         {
 
 
-            int ratePerKm = GetRatePerKm(vehicle);
-            return [(decimal)distanceInKm * ratePerKm ,(decimal) distanceInKm*ratePerKm+15];
+            double ratePerKm = GetRatePerKm(vehicle);
+            return [distanceInKm * ratePerKm , distanceInKm*ratePerKm+15];
         }
 
-        public List<FareType> FareList(LocationType pickup, LocationType destination)
+        public FareListResponseDto FareList(LocationType pickup, LocationType destination)
         {
             double distance = CalculateDistance(pickup, destination);
-            var fareEstimates = new List<FareType>();
+            var fareList = new FareListResponseDto();
 
-            foreach (VehicleType vehicle in Enum.GetValues(typeof(VehicleType)))
+            fareList.Bike = new VehicleDto()
             {
-                int fare = (int)(distance * GetRatePerKm(vehicle));    
-                fareEstimates.Add(new FareType { Vehicle= vehicle.ToString() , FarePrice = fare});
-            }
+                Price = distance * BikeRatePerKm,
+                
+            };
+            fareList.AutoRikshaw = new VehicleDto()
+            {
+                Price = distance * AutoRikshawRatePerKm,
 
-            return fareEstimates;
+            };
+            fareList.Coupe = new VehicleDto()
+            {
+                Price = distance * CoupeRatePerKm,
+
+            };
+
+            fareList.Sedan = new VehicleDto()
+            {
+                Price = distance * SedanRatePerKm,
+
+            };
+            fareList.SUV = new VehicleDto()
+            {
+                Price = distance * SuvRatePerKm,
+
+            };
+            fareList.Van = new VehicleDto()
+            {
+                Price = distance * VanRatePerKm,
+
+            };
+            fareList.Other = new VehicleDto()
+            {
+                Price = distance * OtherRatePerKm,
+
+            };
+
+
+            return fareList;
         }
 
 
-        public int GetRatePerKm(VehicleType vehicleType)
+        public double GetRatePerKm(VehicleType vehicleType)
         {
             return vehicleType switch
             {
@@ -72,7 +105,7 @@ namespace Rido.Common.Utils
                 VehicleType.Coupe => CoupeRatePerKm,
                 VehicleType.Van => VanRatePerKm,
                 VehicleType.AutoRikshaw => AutoRikshawRatePerKm,
-                VehicleType.Motorcycle => MotorcycleRatePerKm,
+                VehicleType.Bike => BikeRatePerKm,
                 VehicleType.Other => OtherRatePerKm,
                 _ => throw new ArgumentException("Invalid vehicle type.")
             };

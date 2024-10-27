@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Rido.Common.Exceptions;
+using Rido.Common.Models.Responses;
 using Rido.Common.Utils;
 using Rido.Data.DataTypes;
 using Rido.Data.DTOs;
@@ -17,12 +18,18 @@ namespace Rido.Services
 
         private IBaseRepository<DriverLocation> _driverLocationRepository;
         private IBaseRepository<RideRequest> _rideRequestRepository;
+        private IBaseRepository<User> _userRepository;
 
 
-        public RideService( IBaseRepository<DriverLocation> driverLocationRepository, IBaseRepository<RideRequest> rideRequestRepository, IServiceProvider serviceProvider) : base(serviceProvider)
+        public RideService( IBaseRepository<DriverLocation> driverLocationRepository
+            ,IBaseRepository<RideRequest> rideRequestRepository
+            ,IServiceProvider serviceProvider
+            ,IBaseRepository<User> userRepository
+            ) : base(serviceProvider)
         {
             _driverLocationRepository = driverLocationRepository;
             _rideRequestRepository = rideRequestRepository;
+            _userRepository = userRepository;
         }
 
 
@@ -30,7 +37,21 @@ namespace Rido.Services
         {
             string currentUserId = GetCurrentUserId();
 
+            var checkRide = _repository.FindAsync(ride => ride.UserId == currentUserId);
+            if (checkRide.Result != null)
+            {
+                throw new ALreadyRideExistsException();
+            }
+
             var rideRequest = _mapper.Map<RideRequest>(rideRequestDto);
+            if (Enum.TryParse<VehicleType>(rideRequestDto.VehicleType, true, out var vehicleType))
+            {
+                rideRequest.VehicleType = vehicleType;
+            }
+            else
+            {
+                throw new ArgumentException($"Invalid VehicleType: {rideRequestDto.VehicleType}");
+            }
             rideRequest.GeohashCode = GeoHasherUtil.Encoder(new LocationType(rideRequestDto.PickupLatitude, rideRequestDto.PickupLongitude));
             RideCalculations rideCalculations = new RideCalculations();
             LocationType destination = new LocationType(rideRequestDto.DestinationLatitude, rideRequestDto.DestinationLongitude);
@@ -40,10 +61,10 @@ namespace Rido.Services
             rideRequest.DistanceInKm = rideCalculations.CalculateDistance(
                pickup, destination
             );
-            decimal[] fare = rideCalculations.CalculateFare(rideRequest.DistanceInKm, rideRequest.VehicleType);
+            double[] fare = rideCalculations.CalculateFare(rideRequest.DistanceInKm, rideRequest.VehicleType);
 
-            rideRequest.MinPrice = fare[0];
-            rideRequest.MaxPrice = fare[1];
+            rideRequest.MinPrice = (decimal)fare[0];
+            rideRequest.MaxPrice = (decimal)fare[1];
 
 
 
@@ -55,16 +76,25 @@ namespace Rido.Services
             return createdRideRequest;
 
         }
-        public async Task<List<RideRequest>> GetRideRequestByLocation(LocationType location)
+        public async Task<List<RideRequestResponseDto>> GetRideRequestList(LocationType location)
         {
 
             string geohash = GeoHasherUtil.Encoder(location);
 
+            var userId = GetCurrentUserId();
+
+            var user = await _userRepository.FindAsync(user => user.Id==userId, user=>user.DriverData);
 
 
-            IEnumerable<RideRequest> createdRideRequest = await _repository.FindAllAsync(item => item.GeohashCode == geohash && item.Status == RideRequestStatus.Requested);
 
-            return createdRideRequest.ToList();
+            IEnumerable<RideRequest> createdRideRequest = await _repository.FindAllAsync(item => 
+            item.GeohashCode == geohash
+            && item.Status == RideRequestStatus.Requested
+            &&item.VehicleType==user.DriverData.VehicleType,item=>item.Rider);
+
+
+
+            return _mapper.Map<List<RideRequestResponseDto>>(createdRideRequest);
 
         }
 
@@ -113,9 +143,6 @@ namespace Rido.Services
 
            
 
-
-
-
         }
 
         public async Task<dynamic> GetRideAndDriverDetail(string rideRequestId)
@@ -129,7 +156,7 @@ namespace Rido.Services
 
             if (result.DriverId == null&&result.Status == RideRequestStatus.Requested)
             {
-                return new { DriverAssigned = false,Massage = "Driver Not Assigned Yet" };
+                throw new DriverNotAssignedException();
             }
 
             var response = new
@@ -148,6 +175,36 @@ namespace Rido.Services
             };
 
             return response;
+        }
+        public async Task<OTPVerificationStatus> VerifyOTP(string otp, string rideRequestId)
+        {
+            var UserId = GetCurrentUserId();
+            bool otpVerify = OtpUtils.MatchOTP(rideRequestId, otp);
+
+
+            if (!otpVerify)
+            {
+
+
+                return OTPVerificationStatus.InvalidOTP;
+
+            }
+
+            var rideRequest = await _rideRequestRepository.GetByIdAsync(rideRequestId);
+
+            if (rideRequest == null || rideRequest.Status != RideRequestStatus.Accepted || rideRequest.DriverId != UserId)
+            {
+                return OTPVerificationStatus.InvalidRideRequestStatus;
+            }
+
+            rideRequest.Status = RideRequestStatus.Started;
+
+            var update = await _rideRequestRepository.UpdateAsync(rideRequest);
+
+
+
+
+            return OTPVerificationStatus.Success;
         }
 
 

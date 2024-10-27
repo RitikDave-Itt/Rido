@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Rido.Common.Exceptions;
 using Rido.Common.Models.Requests;
 using Rido.Services.Interfaces;

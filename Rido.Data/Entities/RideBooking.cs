@@ -35,7 +35,7 @@ namespace Rido.Data.Entities
 
         public string GeohashCode { get; set; }
 
-        public string TransactionId { get; set; }      
+        public string? TransactionId { get; set; }      
         public decimal Amount { get; set; }
 
 

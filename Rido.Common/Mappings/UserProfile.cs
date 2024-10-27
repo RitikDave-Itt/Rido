@@ -17,20 +17,20 @@ namespace Rido.Common.Mappings
               {
                   var dto = new RegisterUserDto
                   {
-                      FirstName = src.GetProperty("FirstName").GetString(),
-                      LastName = src.GetProperty("LastName").GetString(),
-                      Email = src.GetProperty("Email").GetString(),
-                      PhoneNumber = src.GetProperty("PhoneNumber").GetString(),
-                      PasswordHash = src.GetProperty("Password").GetString()      
+                      FirstName = src.GetProperty("firstName").GetString(),
+                      LastName = src.GetProperty("lastName").GetString(),
+                      Email = src.GetProperty("email").GetString(),
+                      PhoneNumber = src.GetProperty("phoneNumber").GetString(),
+                      PasswordHash = src.GetProperty("password").GetString()      
                   };
 
-                  if (src.TryGetProperty("Gender", out JsonElement genderElement) &&
+                  if (src.TryGetProperty("gender", out JsonElement genderElement) &&
                       Enum.TryParse<Gender>(genderElement.GetString(), true, out Gender gender))
                   {
                       dto.Gender = gender;
                   }
 
-                  if (src.TryGetProperty("Role", out JsonElement roleElement) &&
+                  if (src.TryGetProperty("role", out JsonElement roleElement) &&
                       Enum.TryParse<UserRole>(roleElement.GetString(), true, out UserRole role))
                   {
                       dto.Role = role;

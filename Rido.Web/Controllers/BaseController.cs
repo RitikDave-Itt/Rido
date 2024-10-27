@@ -3,6 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using AutoMapper;
+using Rido.Data.Enums;
+using System.IdentityModel.Tokens.Jwt;
+using Rido.Data.DataTypes;
 
 namespace Rido.Web.Controllers
 {
@@ -21,10 +24,25 @@ namespace Rido.Web.Controllers
         }
 
 
+    
+
         protected string GetCurrentUserId()
         {
             return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
         }
+
+        protected string GetCurrentUserEmail()
+        {
+            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
+        }
+
+        protected string GetCurrentUserRole()
+        {
+            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
+        }
+
+        
+
+
     }
 }

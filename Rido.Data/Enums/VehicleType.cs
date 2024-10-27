@@ -13,7 +13,7 @@ namespace Rido.Data.Enums
         Coupe = 3,
         Van = 4,
         AutoRikshaw = 5,
-        Motorcycle = 6,
+        Bike = 6,
         Other = 7
     }
 

@@ -1,13 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Rido.Common.Exceptions;
+using Rido.Common.Models.Requests;
 using Rido.Common.Utils;
 using Rido.Data.DataTypes;
 using Rido.Data.DTOs;
-using Rido.Services;
+using Rido.Data.Entities;
+using Rido.Data.Enums;
 using Rido.Services.Interfaces;
 
 namespace Rido.Web.Controllers
@@ -16,13 +15,16 @@ namespace Rido.Web.Controllers
     [Route("api/ride")]
     [Authorize]
 
-    public class RideController : BaseController<RideController> 
+    public class RideController : BaseController<RideController>
     {
         private readonly IRideService _rideService;
+        private readonly IBaseService<RideRequest> _rideRequestService;
 
-        public RideController(IRideService rideService,IServiceProvider serviceProvider  ): base(serviceProvider)
+
+        public RideController(IRideService rideService, IServiceProvider serviceProvider, IBaseService<RideRequest> rideRequestService) : base(serviceProvider)
         {
             _rideService = rideService;
+            _rideRequestService = rideRequestService;
         }
 
 
@@ -71,7 +73,7 @@ namespace Rido.Web.Controllers
             {
                 if (!ModelState.IsValid)
                 {
-                    return BadRequest(ModelState);      
+                    return BadRequest(ModelState);
                 }
 
 
@@ -79,9 +81,10 @@ namespace Rido.Web.Controllers
 
                 return Ok(new { Message = "Ride Requested Successfully", Data = result.Id });
             }
-            catch(DbUpdateException ex)
+            catch (ALreadyRideExistsException ex)
             {
-                return StatusCode(500, new { Message = "Cannot Create Multiple Ride Request" });
+                return StatusCode(409, new { Message = "Cannot Create Multiple Ride Request" });
+
 
             }
             catch (Exception ex)
@@ -89,14 +92,14 @@ namespace Rido.Web.Controllers
                 return StatusCode(500, new { Message = "An error occurred while  your request." });
             }
         }
-        [Authorize(Roles ="Driver")]
+        [Authorize(Roles = "Driver")]
         [HttpGet("get-ride-list")]
-        public async Task<IActionResult> GetRideRequestByLocation([FromQuery] string latitude , string longitude)
+        public async Task<IActionResult> GetRideRequestByLocation([FromQuery] string latitude, string longitude)
         {
-            LocationType location = new LocationType(latitude,longitude);
+            LocationType location = new LocationType(latitude, longitude);
             try
             {
-                var rideRequests = await _rideService.GetRideRequestByLocation(location);
+                var rideRequests = await _rideService.GetRideRequestList(location);
                 return Ok(rideRequests);
             }
             catch (Exception ex)
@@ -116,7 +119,7 @@ namespace Rido.Web.Controllers
                 var result = await _rideService.CancelRideByUser(rideRequestId);
                 if (result)
                 {
-                    return Ok(new {Success= true});
+                    return Ok(new { Success = true });
                 }
                 return NotFound("Ride request not found .");
             }
@@ -134,7 +137,7 @@ namespace Rido.Web.Controllers
                 var result = await _rideService.CancelRideByDriver(rideRequestId);
                 if (result)
                 {
-                    return Ok(new {success=true,Message = "Ride Cancelled Successfully" });
+                    return Ok(new { success = true, Message = "Ride Cancelled Successfully" });
                 }
                 return NotFound("Ride request Not found or could not be canceled.");
             }
@@ -153,7 +156,7 @@ namespace Rido.Web.Controllers
                 var rideRequest = await _rideService.AssignRideDriver(rideRequestId);
                 if (rideRequest != null)
                 {
-                    return Ok(new {success = true ,Message= "Ride Accepted Successfully" });
+                    return Ok(new { success = true, Message = "Ride Accepted Successfully" });
                 }
                 return NotFound("No available driver or ride request not found.");
             }
@@ -164,36 +167,202 @@ namespace Rido.Web.Controllers
             }
         }
 
-        [HttpGet("ride-confirm-detail/{rideRequestId}")]
-        public async Task<IActionResult> GetRideAndDriverDetail(string rideRequestId)
+        //[HttpGet("ride-confirm-detail/{rideRequestId}")]
+        //public async Task<IActionResult> GetRideAndDriverDetail(string rideRequestId)
+        //{
+        //    try
+        //    {
+        //        var rideAndDriverDetail = await _rideService.GetRideAndDriverDetail(rideRequestId);
+        //        if (rideAndDriverDetail != null)
+        //        {
+        //            return Ok(rideAndDriverDetail);
+        //        }
+        //        else
+        //        {
+        //            return NotFound(new { Message = "Ride Not Found Invalid Id" });
+        //        }
+
+        //    }
+        //    catch (DriverNotAssignedException ex)
+        //    {
+        //        return StatusCode(460, new { Message = "Driver not Assigned" });
+
+
+        //    }
+
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, " error  while retrieving ride and driver details.");
+        //        return StatusCode(500, "Internal server error.");
+        //    }
+        //}
+
+        [HttpPost("verify-otp")]
+        [Authorize(Roles = "Driver")]
+        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto verifyOtpDto)
         {
             try
             {
-                var rideAndDriverDetail = await _rideService.GetRideAndDriverDetail(rideRequestId);
-                if (rideAndDriverDetail != null)
+                var verify = await _rideService.VerifyOTP(verifyOtpDto.Otp, verifyOtpDto.RideRequestId);
+
+                if (verify == OTPVerificationStatus.Success)
                 {
-                    return Ok(rideAndDriverDetail);
+                    var rideRequest = await _rideRequestService.GetByIdAsync(verifyOtpDto.RideRequestId);
+                    rideRequest.Status = RideRequestStatus.InProgress;
+                    var updateRideRequest = await _rideRequestService.UpdateAsync(rideRequest);
+
+                    return Ok(new { Success = true });
+
+                }
+                else if (verify == OTPVerificationStatus.InvalidRideRequestStatus)
+                {
+                    return NotFound(new { success = false, Message = "Invalid ride Request" });
+                }
+                else if (verify == OTPVerificationStatus.InvalidOTP)
+                {
+                    return Unauthorized(new { success = false, Message = "Invalid OTP " });
+
                 }
                 else
                 {
-                    return NotFound(new {Message = "Ride Not Found Invalid Id"});
+                    return BadRequest();
                 }
-
             }
-            catch(DriverNotAssignedException ex)
-            {
-                return StatusCode(460, new { Message = ex.Message });
-
-
-            }
-
             catch (Exception ex)
             {
-                _logger.LogError(ex, " error  while retrieving ride and driver details.");
-                return StatusCode(500, "Internal server error.");
+
+                _logger.LogError(ex, "Something Went Wrong in Otp Verification");
+                return BadRequest();
             }
         }
 
+        [HttpGet("driver")]
+
+        public async Task<IActionResult> GetRideByDriverId()
+        {
+            var userId = GetCurrentUserId();
+
+
+            var rideRequest = await _rideRequestService.FindAsync(ride => ride.DriverId == userId, ride => ride.Rider);
+
+            if (rideRequest == null)
+            {
+                return NotFound(new { success = false });
+
+            }
+
+            else
+            {
+                return Ok(
+                    new
+                    {
+                        id = rideRequest.Id,
+                        pickupLatitude = rideRequest.PickupLatitude,
+                        pickupLongitude = rideRequest.PickupLongitude,
+
+                        pickupAddress = rideRequest.PickupAddress,
+                        pickupTime = rideRequest.PickupTime,
+                        destinationLatitude = rideRequest.DestinationLatitude,
+                        destinationLongitude = rideRequest.DestinationLongitude,
+                        destinationAddress = rideRequest.DestinationAddress,
+                        price = rideRequest.MaxPrice,
+                        vehicleType = rideRequest.VehicleType.ToString(),
+
+                        geohashCode = rideRequest.GeohashCode,
+                        distanceInKm = rideRequest.DistanceInKm,
+                        userName = $"{rideRequest.Rider.FirstName} {rideRequest.Rider.LastName}",
+
+                        status = rideRequest.Status,
+                        gender = rideRequest.Rider.Gender.ToString(),
+                        phoneNumber = rideRequest.Rider.PhoneNumber
+                    }
+                 );
+            }
+
+
+        }
+
+        [HttpGet("ride-confirm-details")]
+
+        public async Task<IActionResult> GetRideByRiderId()
+        {
+            var userId = GetCurrentUserId();
+
+
+            var rideRequest = await _rideRequestService.FindAsync(ride => ride.UserId == userId, ride => ride.Driver, ride => ride.Driver.location);
+
+            if (rideRequest == null)
+            {
+                return NotFound(new { success = false });
+
+            }
+           
+
+            else
+            {
+
+                return Ok(
+                    new
+                    {
+                        rideRequest = new
+                        {
+                            id = rideRequest.Id,
+                            pickupLatitude = rideRequest.PickupLatitude,
+                            pickupLongitude = rideRequest.PickupLongitude,
+
+                            pickupAddress = rideRequest.PickupAddress,
+                            pickupTime = rideRequest.PickupTime,
+                            destinationLatitude = rideRequest.DestinationLatitude,
+                            destinationLongitude = rideRequest.DestinationLongitude,
+                            destinationAddress = rideRequest.DestinationAddress,
+                            price = rideRequest.MaxPrice,
+                            vehicleType = rideRequest.VehicleType.ToString(),
+
+                            geohashCode = rideRequest.GeohashCode,
+                            distanceInKm = rideRequest.DistanceInKm,
+
+                            status = rideRequest.Status.ToString(),
+
+                        }
+                    ,
+                        driver = rideRequest?.Status==RideRequestStatus.Accepted ? new
+                        {
+                            id = rideRequest?.Driver?.Id,
+                            driverName = $"{rideRequest?.Driver.FirstName} {rideRequest?.Driver.LastName}",
+
+                            mobileNo = rideRequest.Driver.PhoneNumber,
+                            vehicleType = rideRequest.VehicleType,
+                            latitude = rideRequest.Driver?.location?.Latitude,
+                            longitude = rideRequest.Driver?.location?.Longitude,
+                            otp = OtpUtils.GenerateOtp(rideRequest.Id)
+
+                        } : null
+                    }
+                 );
+            }
+
+
+        }
+
+        [HttpGet("check-status")]
+        public async Task<IActionResult> CheckStatus()
+        {
+            try
+            {
+                var userID = GetCurrentUserId();
+                var rideRequest = await _rideRequestService.FindAsync(ride=>ride.UserId == userID);
+                if (rideRequest != null)
+                {
+                    return Ok(rideRequest.Status.ToString());
+                }
+                return NotFound();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "error while assigning a driver to the ride request.");
+                return StatusCode(500, "Internal server error.");
+            }
+        }
 
 
 

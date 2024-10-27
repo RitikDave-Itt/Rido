@@ -22,15 +22,14 @@ namespace Rido.Data.Entities
         public string PasswordHash { get; set; }
         public UserRole Role { get; set; }
 
-        public DriverData? DriverData { get; set; } = null;
+        public DriverData? DriverData { get; set; } 
 
-        public RideRequest? RideRequest { get; set; } = null;
+        public RideRequest? RideRequest { get; set; }
+        public Wallet Wallet { get; set; }
 
-        public Wallet? Wallet { get; set; }
+        public DriverLocation? location { get; set; } 
 
-        public DriverLocation? location { get; set; } = null;
-
-        public Image ProfileImage { get; set; } = null;
+        public Image? ProfileImage { get; set; } 
        
 
     }

@@ -326,7 +326,6 @@ namespace Rido.Data.Migrations
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("BookingId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Comment")
@@ -336,20 +335,19 @@ namespace Rido.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("DriverId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<decimal>("Rating")
                         .HasColumnType("decimal(2,1)");
 
                     b.Property<string>("UserId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
                     b.HasIndex("BookingId")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[BookingId] IS NOT NULL");
 
                     b.HasIndex("DriverId");
 
@@ -447,6 +445,12 @@ namespace Rido.Data.Migrations
                         .HasDefaultValueSql("GETDATE()");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("Email")
+                        .IsUnique();
+
+                    b.HasIndex("PhoneNumber")
+                        .IsUnique();
 
                     b.HasIndex("ProfileImageId")
                         .IsUnique()
@@ -601,20 +605,17 @@ namespace Rido.Data.Migrations
                     b.HasOne("Rido.Data.Entities.RideBooking", "Booking")
                         .WithOne()
                         .HasForeignKey("Rido.Data.Entities.RideReview", "BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Rido.Data.Entities.User", "Driver")
                         .WithMany()
                         .HasForeignKey("DriverId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Rido.Data.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Booking");
 
@@ -676,7 +677,8 @@ namespace Rido.Data.Migrations
 
                     b.Navigation("RideRequest");
 
-                    b.Navigation("Wallet");
+                    b.Navigation("Wallet")
+                        .IsRequired();
 
                     b.Navigation("location");
                 });

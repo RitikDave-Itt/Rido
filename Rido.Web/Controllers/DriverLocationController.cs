@@ -5,9 +5,7 @@ using Rido.Services.Interfaces;
 using Rido.Data.Enums;
 using System;
 using System.Threading.Tasks;
-using Xunit.Sdk;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Rido.Data.DataTypes;
 
 namespace Rido.Web.Controllers

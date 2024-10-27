@@ -24,7 +24,12 @@ namespace Rido.Data.Configurations
 
             builder.Property(p => p.Email)
                 .IsRequired()
-                .HasMaxLength(100);
+                .HasMaxLength(250);
+
+            builder.HasIndex(p => p.Email)
+                .IsUnique();
+            builder.HasIndex(p => p.PhoneNumber)
+                .IsUnique();
 
             builder.Property(p => p.PhoneNumber)
                 .IsRequired()

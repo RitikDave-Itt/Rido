@@ -11,6 +11,7 @@ using Rido.Data.Enums;
 using System.Text.RegularExpressions;
 using Rido.Common.Secrets;
 using Microsoft.Extensions.Options;
+using Rido.Common.Attributes;
 
 
 namespace Rido.Services
@@ -18,9 +19,7 @@ namespace Rido.Services
     public class AuthService : BaseService<User>, IAuthServices
     {
         private readonly IBaseRepository<DriverData> _driverRepository;
-        private readonly IUserRepository _userRepository;
         private readonly IBaseRepository<RefreshToken> _refreshTokenRepository;
-        private readonly IBaseRepository<User> _userBaseRepository;
         private readonly IBaseRepository<RideRequest> _rideRequestRepository;
 
 
@@ -44,33 +43,35 @@ namespace Rido.Services
         {
             _jwtService = jwtService;
             _driverRepository = driverRepository;
-            _userRepository = userRepository;
             _refreshTokenRepository = refreshTokenRepository;
             _jwtSettings = jwtSettings.Value;
-            _userBaseRepository = userBaseRepository;
             _rideRequestRepository = rideRequestRepository;
 
 
         }
 
-        public async Task<LoginResponse> LoginUserAsync(LoginUserDto loginUserDto)
+        public async Task<LoginResponseDto> LoginUserAsync(LoginUserDto loginUserDto)
         {
+
             var user = await _repository.FindAsync(u => u.Email == loginUserDto.Email);
 
             if (user == null || !PasswordHasher.VerifyPassword(user.PasswordHash, loginUserDto.Password))
             {
-                return new LoginResponse { Success = false, Token = null };
+                return new LoginResponseDto() { Success = false };
             }
+
 
             var existingRefreshToken = await _refreshTokenRepository.FindAsync(rt => rt.UserId == user.Id);
 
             RefreshToken refreshToken;
 
+            string token = Guid.NewGuid().ToString();
+
             if (existingRefreshToken == null)
             {
                 refreshToken = new RefreshToken
                 {
-                    Token = Guid.NewGuid().ToString(),
+                    Token = token,
                     UserId = user.Id,
                     Expiry = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpiryInDays)
                 };
@@ -79,7 +80,7 @@ namespace Rido.Services
             }
             else
             {
-                existingRefreshToken.Token = Guid.NewGuid().ToString();
+                existingRefreshToken.Token = token;
                 existingRefreshToken.Expiry = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpiryInDays);
 
                 bool updateSuccess = await _refreshTokenRepository.UpdateAsync(existingRefreshToken);
@@ -92,13 +93,30 @@ namespace Rido.Services
                 refreshToken = existingRefreshToken;
             }
 
-            return new LoginResponse
+            string refreshTokenString = _jwtService.GenerateRefreshToken(user.Id, user.Email, refreshToken.Token);
+
+
+            return new LoginResponseDto
             {
                 Success = true,
                 Token = _jwtService.GenerateToken(user.Id.ToString(), user.Email, user.Role),
-                RefreshToken = refreshToken?.Token,
+                RefreshToken = refreshTokenString,
+                User = new
+                {
+
+                    Name = $"{user?.LastName} {user?.LastName}",
+                    email = user?.Email,
+                    Role = user?.Role.ToString(),
+                    profileImage = user?.ProfileImage?.Base64String,
+                    Gender = user?.Gender.ToString(),
+                    PhoneNumber = user?.PhoneNumber.ToString(),
+                    VehicleType = user?.DriverData?.VehicleType.ToString(),
+
+                }
             };
         }
+    
+        
 
 
         public async Task<string> RegisterUserAsync(RegisterUserDto userDto, RegisterDriverDto driverDto = null)
@@ -109,7 +127,10 @@ namespace Rido.Services
 
             DriverData driver = new DriverData();
             if (driverDto != null) {
+
                 driver = _mapper.Map<DriverData>(driverDto);
+
+                user.DriverData = driver;
 
             }
             else
@@ -124,44 +145,19 @@ namespace Rido.Services
                 WalletStatus = WalletStatus.Active
             };
 
-            var registeredUser = await _userRepository.CreateUser(user, wallet, driver);
+            user.Wallet = wallet;
+
+
+            var registeredUser = await _repository.AddAsync(user);
 
 
 
-            return registeredUser;
+            return registeredUser.Id;
         }
 
-        public async Task<OTPVerificationStatus> VerifyOTP(string otp, string rideRequestId)
-        {
-            var UserId = GetCurrentUserId();
-            bool otpVerify = OtpUtils.MatchOTP(rideRequestId, otp);
+      
 
-
-            if (!otpVerify) { 
-
-
-                return OTPVerificationStatus.InvalidOTP;
-            
-            }
-
-            var rideRequest  = await _rideRequestRepository.GetByIdAsync(rideRequestId);
-
-            if (rideRequest == null||rideRequest.Status!=RideRequestStatus.Accepted||rideRequest.DriverId!=UserId) {
-                return OTPVerificationStatus.InvalidRideRequestStatus;
-            }
-
-            rideRequest.Status = RideRequestStatus.Started; 
-
-            var update = await _rideRequestRepository.UpdateAsync(rideRequest);
-
-                   
-
-
-         return  OTPVerificationStatus.Success;
-        }
-
-
-        public async Task<(bool IsValid , string? RefreshToken  , string? JwtToken )> VerifyAndGenerateRefreshToken(string token)
+        public async Task<(bool IsValid , string? RefreshToken  , string? AccessToken )> VerifyAndGenerateRefreshToken(string token)
         {
             var refreshToken = await _refreshTokenRepository.FindAsync(t => t.Token==token, t=>t.User);
 
@@ -171,13 +167,16 @@ namespace Rido.Services
                 return (
                     IsValid : false,
                     RefreshToken : null,
-                    JwtToken:null
+                    AccessToken:null
                     );
             }
+            var newToken = Guid.NewGuid().ToString();
 
             var JwtToken = _jwtService.GenerateToken(refreshToken.UserId, refreshToken.User.Email, refreshToken.User.Role);
             refreshToken.IsRevoked = false;
-            refreshToken.Token = Guid.NewGuid().ToString();
+            refreshToken.Token = newToken;
+
+            var jwtRefreshToken = _jwtService.GenerateRefreshToken(refreshToken.User.Id, refreshToken.User.Email, newToken);
 
             var saveRefreshToken = await _refreshTokenRepository.UpdateAsync(refreshToken);
 
@@ -188,8 +187,8 @@ namespace Rido.Services
 
             return (
                 IsValid: true,
-                RefreshToken: refreshToken.Token,
-                JwtToken
+                RefreshToken: jwtRefreshToken,
+                AccessToken:JwtToken
                 );
             
             

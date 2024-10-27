@@ -11,11 +11,10 @@ namespace Rido.Services.Interfaces
 {
     public interface IAuthServices
     {
-        public Task<LoginResponse> LoginUserAsync(LoginUserDto loginUserDto);
+        public Task<LoginResponseDto> LoginUserAsync(LoginUserDto loginUserDto);
         public Task<string> RegisterUserAsync(RegisterUserDto userDto ,RegisterDriverDto driverDto);
 
-        public Task<OTPVerificationStatus> VerifyOTP(string otp, string rideRequestId);
-        Task<(bool IsValid, string? RefreshToken, string? JwtToken)> VerifyAndGenerateRefreshToken(string token);
+        Task<(bool IsValid, string? RefreshToken, string? AccessToken)> VerifyAndGenerateRefreshToken(string token);
 
 
     }

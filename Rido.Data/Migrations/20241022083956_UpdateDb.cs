@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Rido.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateRelationTable : Migration
+    public partial class UpdateDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -281,9 +281,9 @@ namespace Rido.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DriverId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    BookingId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    DriverId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    BookingId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Rating = table.Column<decimal>(type: "decimal(2,1)", nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -295,8 +295,7 @@ namespace Rido.Data.Migrations
                         name: "FK_RideReview_RideBookings_BookingId",
                         column: x => x.BookingId,
                         principalTable: "RideBookings",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_RideReview_Users_DriverId",
                         column: x => x.DriverId,
@@ -387,7 +386,8 @@ namespace Rido.Data.Migrations
                 name: "IX_RideReview_BookingId",
                 table: "RideReview",
                 column: "BookingId",
-                unique: true);
+                unique: true,
+                filter: "[BookingId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RideReview_DriverId",
@@ -408,6 +408,18 @@ namespace Rido.Data.Migrations
                 name: "IX_RideTransactions_UserId",
                 table: "RideTransactions",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_Email",
+                table: "Users",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_PhoneNumber",
+                table: "Users",
+                column: "PhoneNumber",
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Users_ProfileImageId",

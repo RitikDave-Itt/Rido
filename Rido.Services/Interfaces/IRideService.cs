@@ -2,6 +2,7 @@
 using Rido.Data.DataTypes;
 using Rido.Data.DTOs;
 using Rido.Data.Entities;
+using Rido.Data.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,7 +15,7 @@ namespace Rido.Services.Interfaces
     {
         Task<RideRequest> CreateRideRequest(RideRequestDto rideRequestDto);
 
-        Task<List<RideRequest>> GetRideRequestByLocation(LocationType location);
+        Task<List<RideRequestResponseDto>> GetRideRequestList(LocationType location);
 
         Task<bool> CancelRideByUser(string rideRequestId);
 
@@ -22,6 +23,8 @@ namespace Rido.Services.Interfaces
 
         Task<RideRequest> AssignRideDriver(string rideRequestId);
         Task<dynamic> GetRideAndDriverDetail(string rideRequestId);
+        Task<OTPVerificationStatus> VerifyOTP(string otp, string rideRequestId);
+
 
     }
 }

@@ -28,7 +28,7 @@ namespace Rido.Services
         new Claim(JwtRegisteredClaimNames.Email, email),
         new Claim(ClaimTypes.Role, role.ToString()),      
         new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
-    };
+            };
 
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
@@ -43,16 +43,28 @@ namespace Rido.Services
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
 
-        public RefreshToken GenerateRefreshToken()
+        public string GenerateRefreshToken(string userId, string email,string refreshTokenGuid)
         {
-            var refreshToken = new RefreshToken
-            {
-                Token = Guid.NewGuid().ToString(),     
-                Expiry = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpiryInDays),       
-                IsRevoked = false,
+           
+            var claims = new[]
+           {
+                new Claim(JwtRegisteredClaimNames.Sub, userId),
+                new Claim(JwtRegisteredClaimNames.Email, email),
+                new Claim("refreshToken", refreshTokenGuid),     
+                new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_jwtSettings.Secret));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-            return refreshToken;
+            var refreshToken = new JwtSecurityToken(
+                issuer: _jwtSettings.Issuer,
+                audience: _jwtSettings.Audience,
+                claims: claims,
+                expires: DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpiryInDays),       
+                signingCredentials: creds);
+
+
+            return  new JwtSecurityTokenHandler().WriteToken(refreshToken);
         }
 
 

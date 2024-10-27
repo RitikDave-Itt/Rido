@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.VisualStudio.TestPlatform.CommunicationUtilities;
 using Rido.Services;
 using Rido.Services.Interfaces;
 
@@ -12,6 +11,7 @@ namespace Rido.Web.Controllers
     public class RideTransactionController:BaseController<RideTransactionController>
     {
         private IRideTransactionService _rideTransactionService;
+        
         public RideTransactionController(IServiceProvider serviceProvider ,IRideTransactionService rideTransactionService):base(serviceProvider) 
         {
             _rideTransactionService = rideTransactionService;

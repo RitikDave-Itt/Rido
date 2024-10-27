@@ -17,7 +17,6 @@ namespace Rido.Web.Controllers
     public class AuthController : BaseController<AuthController>
     {
         private readonly IAuthServices _authService;
-        private readonly IBaseService<RideRequest> _rideRequestService;
         private readonly IBaseService<DriverData> _driverService;
         private readonly IBaseService<User> _userService;
 
@@ -25,7 +24,6 @@ namespace Rido.Web.Controllers
         public AuthController(IAuthServices authService,IBaseService<RideRequest> rideRequestService,IBaseService<DriverData> driverService , IServiceProvider serviceProvider,IBaseService<User> userService):base(serviceProvider)
         {
             _authService = authService;
-            _rideRequestService = rideRequestService;
             _driverService = driverService;
             _userService = userService;
         }
@@ -66,7 +64,7 @@ namespace Rido.Web.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex,"\n\n\n Exception in User Registration \n\n\n");
+                _logger.LogError(ex,$"\n\n\n Exception in User Registration \n\n\n{request}");
 
                 
 
@@ -84,65 +82,38 @@ namespace Rido.Web.Controllers
 
                 if (!result.Success)
                 {
-                    return StatusCode(500, "Email or Password Invalid!");
+                    return StatusCode(401, "Email or Password Invalid!");
                 }
 
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
-                    SameSite = SameSiteMode.Strict,
+                    SameSite = SameSiteMode.None,  
+                    Secure = true,
                     Expires = DateTimeOffset.Now.AddMinutes(60),
                     Path = "/"
                 };
 
-                Response.Cookies.Append("access_token", result.Token, cookieOptions);
+                Response.Cookies.Append("accessToken", result?.Token, cookieOptions);
+                Response.Cookies.Append("refreshToken", result?.RefreshToken, cookieOptions);
 
-                return Ok(result);
+
+                return Ok(new
+                {
+                    AccessToken = result.Token,
+                    RefreshToken = result?.RefreshToken,
+                    User = result?.User,
+                });
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "eXCEPTION IN LOGIN");
 
                 return StatusCode(500, new { Message = "Failed to log in. Please try again later.", Error = ex.Message });
             }
         }
 
-        [HttpPost("verify-otp")]
-        [Authorize(Roles = "Driver")]
-        public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpDto verifyOtpDto)
-        {
-            try
-            {
-                var verify = await _authService.VerifyOTP(verifyOtpDto.Otp, verifyOtpDto.RideRequestId);
-
-                if (verify == OTPVerificationStatus.Success)
-                {
-                    var rideRequest = await _rideRequestService.GetByIdAsync(verifyOtpDto.RideRequestId);
-                    rideRequest.Status = RideRequestStatus.InProgress;
-                    var updateRideRequest = await _rideRequestService.UpdateAsync(rideRequest);
-
-                    return Ok(new { Success = true });
-
-                }
-                else if (verify == OTPVerificationStatus.InvalidRideRequestStatus)
-                {
-                    return NotFound(new { success = false, Message = "Invalid ride Request" });
-                }
-                else if (verify == OTPVerificationStatus.InvalidOTP)
-                {
-                    return Unauthorized(new { success = false, Message = "Invalid OTP " });
-
-                }
-                else
-                {
-                    return BadRequest();
-                }
-            }
-            catch (Exception ex) {
-
-                _logger.LogError(ex, "Something Went Wrong in Otp Verification");
-                return BadRequest();
-            }
-        }
+      
 
 
         [HttpPost("refresh-token")]
@@ -155,16 +126,21 @@ namespace Rido.Web.Controllers
                 {
                     return Unauthorized("Refresh Token Not Found");
                 }
-                var refreshToken = authHeader.Substring("Bearer ".Length).Trim();
+                var refreshTokenString = _httpContextAccessor.HttpContext.User.Claims.FirstOrDefault(c=>c.Type=="refreshToken");
+                
+                if (refreshTokenString == null)
+                {
+                    return Unauthorized("Refresh Token Not Found");
+                }
 
-                var (IsValid,RefreshToken,JwtToken) = await _authService.VerifyAndGenerateRefreshToken(refreshToken);
+                var (IsValid,RefreshToken,AccessToken) = await _authService.VerifyAndGenerateRefreshToken(refreshTokenString.Value);
 
                 if (!IsValid) {
                     return Unauthorized("Refresh Token Expired Or Not Found");
 
                 }
 
-                return Ok(new {IsValid,RefreshToken,JwtToken});
+                return Ok(new {IsValid,RefreshToken,AccessToken});
             }
             catch (Exception ex)
             {
@@ -177,7 +153,11 @@ namespace Rido.Web.Controllers
 
 
 
+
+
         }
+        
+
 
 
     }

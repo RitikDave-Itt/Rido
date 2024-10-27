@@ -55,7 +55,7 @@ namespace Rido.Web.Controllers
         }
 
 
-        [HttpGet("accurate-address")]
+        [HttpGet("address")]
         public async Task<ActionResult<ReverseGeocodeResponseDto>> GetAddress([FromQuery] LocationType requestDto)
         {
             if (requestDto == null)

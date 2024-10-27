@@ -20,6 +20,7 @@ namespace Rido.Web
             builder.Services.AddHttpContextAccessor();
             builder.Services.ConfigureSwagger();
             builder.Services.AddControllers();
+            builder.Services.SetupCors();
 
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
@@ -33,7 +34,7 @@ namespace Rido.Web
                 app.UseSwaggerUI();
 
             }
-
+            app.UseCors("AllowOrigins");
             app.UseHttpsRedirection();
             app.UseAuthentication();
             app.UseAuthorization();

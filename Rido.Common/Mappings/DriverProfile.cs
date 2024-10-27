@@ -19,17 +19,17 @@ namespace Rido.Common.Mappings
             {
                 var dto = new RegisterDriverDto();
 
-                if (src.TryGetProperty("VehicleRegistrationNumber", out JsonElement registrationNumberElement))
+                if (src.TryGetProperty("vehicleRegistrationNumber", out JsonElement registrationNumberElement))
                 {
                     dto.VehicleRegistrationNumber = registrationNumberElement.GetString();
                 }
 
-                if (src.TryGetProperty("VehicleMake", out JsonElement vehicleMakeElement))
+                if (src.TryGetProperty("vehicleMake", out JsonElement vehicleMakeElement))
                 {
                     dto.VehicleMake = vehicleMakeElement.GetString();
                 }
 
-                if (src.TryGetProperty("VehicleType", out JsonElement vehicleTypeElement) &&
+                if (src.TryGetProperty("vehicleType", out JsonElement vehicleTypeElement) &&
                     Enum.TryParse<VehicleType>(vehicleTypeElement.GetString(), true, out VehicleType vehicleType))
                 {
                     dto.VehicleType = vehicleType;
@@ -39,19 +39,19 @@ namespace Rido.Common.Mappings
                     throw new ArgumentException("Vehicle Type is Required");
                 }
 
-                if (src.TryGetProperty("LicenceType", out JsonElement licenceTypeElement))
+                if (src.TryGetProperty("licenceType", out JsonElement licenceTypeElement))
                 {
                     dto.LicenseType = licenceTypeElement.GetString();
                 }
 
-                if (src.TryGetProperty("LicenceNumber", out JsonElement licenceNumberElement))
+                if (src.TryGetProperty("licenceNumber", out JsonElement licenceNumberElement))
                 {
                     dto.LicenseNumber = licenceNumberElement.GetString();
                 }
 
                 
 
-                if (src.TryGetProperty("VehicleModel", out JsonElement vehicleModelElement))
+                if (src.TryGetProperty("vehicleModel", out JsonElement vehicleModelElement))
                 {
                     dto.VehicleModel = vehicleModelElement.GetString();
                 }

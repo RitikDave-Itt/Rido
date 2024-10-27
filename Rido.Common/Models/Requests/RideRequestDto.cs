@@ -34,7 +34,7 @@ namespace Rido.Data.DTOs
         
 
         [Required]
-        public VehicleType VehicleType { get; set; }
+        public string VehicleType { get; set; }
 
      
 
