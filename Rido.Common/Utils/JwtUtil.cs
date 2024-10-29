@@ -4,7 +4,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 
 using Rido.Common.Secrets;
 using Rido.Data.Entities;
@@ -37,7 +37,7 @@ namespace Rido.Services
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.Now.AddMinutes(_jwtSettings.ExpiryInMinutes),
+                expires: DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryInMinutes),
                 signingCredentials: creds);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
@@ -60,7 +60,7 @@ namespace Rido.Services
                 issuer: _jwtSettings.Issuer,
                 audience: _jwtSettings.Audience,
                 claims: claims,
-                expires: DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpiryInDays),       
+                expires: DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryInDays),       
                 signingCredentials: creds);
 
 

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Rido.Data.DataTypes;
+using Rido.Model.DataTypes;
 
 using Geohash;
 

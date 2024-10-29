@@ -20,4 +20,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Rido.Model\Rido.Model.csproj" />
+  </ItemGroup>
+
 </Project>

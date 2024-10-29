@@ -1,4 +1,4 @@
-﻿using Rido.Data.Enums;
+﻿using Rido.Model.Enums;
 using System;
 
 namespace Rido.Data.Entities
@@ -10,7 +10,7 @@ namespace Rido.Data.Entities
         public decimal Amount { get; set; }      
         public WalletTransactionType Type { get; set; }
         public WalletTransactionStatus Status { get; set; } = WalletTransactionStatus.Completed;        
-        public DateTime CreatedAt { get; set; } = DateTime.Now;        
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;        
         public DateTime? UpdatedAt { get; set; }
 
         public string RazorPayId { get; set; } = null;

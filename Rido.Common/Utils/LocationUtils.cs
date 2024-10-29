@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json.Linq;
-using Rido.Common.Models.Requests;
-using Rido.Common.Models.Responses;
+using Rido.Model.Requests;
+using Rido.Model.Responses;
 using Rido.Common.Secrets;
-using Rido.Data.DataTypes;
+using Rido.Model.DataTypes;
 
 
 namespace Rido.Services

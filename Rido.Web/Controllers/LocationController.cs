@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Rido.Common.Models.Requests;
-using Rido.Common.Models.Responses;
-using Rido.Data.DataTypes;
+using Rido.Model.Requests;
+using Rido.Model.Responses;
+using Rido.Model.DataTypes;
 using Rido.Services;
 using Rido.Services.Interfaces;
 using System.Collections.Generic;

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Rido.Data.Contexts;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using Rido.Data.Repositories.Interfaces;
 using System;
 using System.Threading.Tasks;
@@ -34,7 +34,7 @@ namespace Rido.Data.Repositories
 
                     wallet.Balance += walletTransaction.Amount;
 
-                    wallet.UpdatedAt = DateTime.Now;
+                    wallet.UpdatedAt = DateTime.UtcNow;
                     await _dbContext.SaveChangesAsync();
 
                     await transaction.CommitAsync();
@@ -66,7 +66,7 @@ namespace Rido.Data.Repositories
 
                     wallet.Balance -= walletTransaction.Amount;    
 
-                    wallet.UpdatedAt = DateTime.Now;
+                    wallet.UpdatedAt = DateTime.UtcNow;
                     await _dbContext.SaveChangesAsync();
 
                     await transaction.CommitAsync();

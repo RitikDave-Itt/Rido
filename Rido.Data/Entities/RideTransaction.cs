@@ -1,5 +1,5 @@
 ﻿using System;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 
 namespace Rido.Data.Entities
 {
@@ -9,9 +9,10 @@ namespace Rido.Data.Entities
         public string? UserId { get; set; }      
         public string? DriverId { get; set; }     
         public decimal Amount { get; set; }      
-        public DateTime Date { get; set; } = DateTime.Now;       
+        public DateTime Date { get; set; } = DateTime.UtcNow;       
         public RideTransactionStatus Status { get; set; }       
-        public string Remarks { get; set; }      
+        public string Remarks { get; set; }   
+        public string RideRequestId { get; set; }
 
         public User? Rider { get; set; }
 

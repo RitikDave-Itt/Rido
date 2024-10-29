@@ -1,8 +1,8 @@
-﻿using Rido.Common.Models.Responses;
-using Rido.Data.DataTypes;
+﻿using Rido.Model.Responses;
+using Rido.Model.DataTypes;
 using Rido.Data.DTOs;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace Rido.Services.Interfaces
 {
-    public interface  IRideService
+    public interface  IRideService:IBaseService<RideRequest>
     {
         Task<RideRequest> CreateRideRequest(RideRequestDto rideRequestDto);
 

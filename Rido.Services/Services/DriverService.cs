@@ -1,8 +1,8 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
-using Rido.Common.Models.Requests;
+using Rido.Model.Requests;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using Rido.Data.Repositories;
 using Rido.Data.Repositories.Interfaces;
 using Rido.Services.Interfaces;

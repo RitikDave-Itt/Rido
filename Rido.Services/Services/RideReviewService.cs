@@ -1,5 +1,5 @@
 ﻿using Rido.Common.Exceptions;
-using Rido.Common.Models.Requests;
+using Rido.Model.Requests;
 using Rido.Data.DTOs;
 using Rido.Data.Entities;
 using Rido.Data.Repositories.Interfaces;

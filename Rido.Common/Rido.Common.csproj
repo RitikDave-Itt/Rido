@@ -16,6 +16,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Rido.Data\Rido.Data.csproj" />
+    <ProjectReference Include="..\Rido.Model\Rido.Model.csproj" />
   </ItemGroup>
 
   <ItemGroup>

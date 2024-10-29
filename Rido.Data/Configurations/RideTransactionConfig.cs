@@ -25,7 +25,13 @@ namespace Rido.Data.Configurations
                 .ValueGeneratedOnAdd();       
 
             builder.Property(rt => rt.Status)
-                .IsRequired();    
+                .IsRequired();
+
+            builder.Property(rt => rt.RideRequestId)
+               .IsRequired();
+
+            builder.HasIndex(rt => rt.RideRequestId)
+                .IsUnique();
 
             builder.Property(rt => rt.Remarks)
                 .IsRequired(false);    

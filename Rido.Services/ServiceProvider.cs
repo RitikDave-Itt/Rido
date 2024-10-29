@@ -19,6 +19,7 @@ namespace Rido.Services
             services.AddScoped<IRideService, RideService>();
             services.AddScoped<LocationUtils>();     
             services.AddScoped(typeof(IBaseService<>), typeof(BaseService<>));
+
             services.AddScoped<IRideTransactionService, RideTransactionService>();
             services.AddScoped<IRideReviewService, RideReviewService>();
             services.AddScoped<IWalletTransactionService, WalletTransactionService>();

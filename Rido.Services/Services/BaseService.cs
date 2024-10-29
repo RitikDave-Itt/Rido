@@ -31,6 +31,15 @@ namespace Rido.Services
             return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
+        protected string GetCurrentUserEmail()
+        {
+            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Email)?.Value;
+        }
+
+        protected string GetCurrentUserRole()
+        {
+            return _httpContextAccessor.HttpContext?.User?.FindFirst(ClaimTypes.Role)?.Value;
+        }
         public async Task<T> AddAsync(T entity)
         {
             return await _repository.AddAsync(entity);

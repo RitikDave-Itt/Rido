@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Rido.Common.Models.Requests;
+using Rido.Model.Requests;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using System.Text.Json;
 
 namespace Rido.Common.Mappings
@@ -11,8 +11,8 @@ namespace Rido.Common.Mappings
         public DriverProfile()
         {
             CreateMap<RegisterDriverDto, DriverData>()
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.Now))
-                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.Now))
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
+                .ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
                 .ForMember(dest => dest.VehicleMake, opt => opt.MapFrom(src => src.VehicleMake));
 
             CreateMap<JsonElement, RegisterDriverDto>().ConvertUsing((src, dest) =>

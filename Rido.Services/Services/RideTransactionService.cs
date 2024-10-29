@@ -1,6 +1,6 @@
 ﻿using Rido.Data.Contexts;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using Rido.Data.Repositories.Interfaces;
 using Rido.Services.Interfaces;
 using System;
@@ -29,7 +29,7 @@ namespace Rido.Services
             ,ride=>ride.Driver.Wallet
             
             );
-            if (rideRequest == null) {
+            if (rideRequest == null||rideRequest.Rider.Wallet.Balance < rideRequest.MaxPrice) {
                 return null;
             }
 
@@ -47,6 +47,7 @@ namespace Rido.Services
                 Remarks ="",
                 Rider = rideRequest.Rider,
                 Driver = rideRequest.Driver,
+                RideRequestId = rideRequestId
 
             };
 
@@ -82,6 +83,8 @@ namespace Rido.Services
             return  result.Id;
 
         }
+
+
 
     }
 }

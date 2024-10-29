@@ -2,11 +2,11 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Rido.Services.Interfaces;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using System;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
-using Rido.Data.DataTypes;
+using Rido.Model.DataTypes;
 
 namespace Rido.Web.Controllers
 {

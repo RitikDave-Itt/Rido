@@ -1,5 +1,5 @@
 ﻿using System.Threading.Tasks;
-using Rido.Common.Models.Requests;
+using Rido.Model.Requests;
 
 namespace Rido.Services.Interfaces
 {

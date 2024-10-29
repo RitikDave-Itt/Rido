@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Rido.Common.Models.Requests;
+using Rido.Model.Requests;
 using Rido.Services.Interfaces;
-using Rido.Common.Attributes;
+using Rido.Model.Attributes;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using AutoMapper;
 using Rido.Services;
 

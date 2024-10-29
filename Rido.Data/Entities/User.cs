@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Text.Json.Serialization;
 using AutoMapper.Configuration.Annotations;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 
 namespace Rido.Data.Entities
 {

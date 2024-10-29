@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rido.Common.Exceptions;
-using Rido.Common.Models.Requests;
+using Rido.Model.Requests;
 using Rido.Services.Interfaces;
 using System;
 using System.Threading.Tasks;

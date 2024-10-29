@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Rido.Common.Exceptions;
-using Rido.Common.Models.Responses;
+using Rido.Model.Responses;
 using Rido.Common.Utils;
-using Rido.Data.DataTypes;
+using Rido.Model.DataTypes;
 using Rido.Data.DTOs;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using Rido.Data.Repositories.Interfaces;
 using Rido.Services.Interfaces;
 using System.Text.RegularExpressions;
@@ -37,13 +37,19 @@ namespace Rido.Services
         {
             string currentUserId = GetCurrentUserId();
 
+            
+
             var checkRide = _repository.FindAsync(ride => ride.UserId == currentUserId);
             if (checkRide.Result != null)
             {
                 throw new ALreadyRideExistsException();
             }
 
+
+            
+
             var rideRequest = _mapper.Map<RideRequest>(rideRequestDto);
+
             if (Enum.TryParse<VehicleType>(rideRequestDto.VehicleType, true, out var vehicleType))
             {
                 rideRequest.VehicleType = vehicleType;
@@ -52,6 +58,7 @@ namespace Rido.Services
             {
                 throw new ArgumentException($"Invalid VehicleType: {rideRequestDto.VehicleType}");
             }
+
             rideRequest.GeohashCode = GeoHasherUtil.Encoder(new LocationType(rideRequestDto.PickupLatitude, rideRequestDto.PickupLongitude));
             RideCalculations rideCalculations = new RideCalculations();
             LocationType destination = new LocationType(rideRequestDto.DestinationLatitude, rideRequestDto.DestinationLongitude);
@@ -66,6 +73,21 @@ namespace Rido.Services
             rideRequest.MinPrice = (decimal)fare[0];
             rideRequest.MaxPrice = (decimal)fare[1];
 
+            var user = await _userRepository.FindAsync(u => u.Id == currentUserId, u => u.Wallet);
+
+            
+            if (user != null&&user.Wallet.Balance < rideRequest.MaxPrice)
+            {
+                throw new LowBalanceException();
+                  
+
+            }
+            
+
+
+
+
+            
 
 
             rideRequest.UserId = currentUserId;
@@ -197,7 +219,7 @@ namespace Rido.Services
                 return OTPVerificationStatus.InvalidRideRequestStatus;
             }
 
-            rideRequest.Status = RideRequestStatus.Started;
+            rideRequest.Status = RideRequestStatus.InProgress;
 
             var update = await _rideRequestRepository.UpdateAsync(rideRequest);
 
@@ -207,6 +229,7 @@ namespace Rido.Services
             return OTPVerificationStatus.Success;
         }
 
+       
 
 
     }

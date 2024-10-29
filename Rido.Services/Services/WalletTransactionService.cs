@@ -1,7 +1,7 @@
 ﻿using Rido.Common.Exceptions;
-using Rido.Common.Models.Requests;
+using Rido.Model.Requests;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 
 using Rido.Data.Repositories.Interfaces;
 using Rido.Services.Interfaces;
@@ -31,7 +31,7 @@ namespace Rido.Services.Services
                 Amount = transactionDto.Amount,
                 Type = WalletTransactionType.Credit,
                 UserId = GetCurrentUserId(),
-                UpdatedAt = DateTime.Now
+                UpdatedAt = DateTime.UtcNow
 
 
 
@@ -67,7 +67,7 @@ namespace Rido.Services.Services
                 Amount = transactionDto.Amount,
                 Type =WalletTransactionType.Withdraw,
                 UserId = GetCurrentUserId(),
-                CreatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow
 
 
 

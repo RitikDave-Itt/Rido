@@ -21,7 +21,7 @@ namespace Rido.Data.Entities
 
         public decimal Rating { get; set; }          
             public string? Comment { get; set; }       
-            public DateTime CreatedAt { get; set; } = DateTime.Now;        
+            public DateTime CreatedAt { get; set; } = DateTime.UtcNow;        
 
             public User? User { get; set; }      
             public User? Driver { get; set; }      

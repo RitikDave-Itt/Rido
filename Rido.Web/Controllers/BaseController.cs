@@ -3,9 +3,9 @@ using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using AutoMapper;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using System.IdentityModel.Tokens.Jwt;
-using Rido.Data.DataTypes;
+using Rido.Model.DataTypes;
 
 namespace Rido.Web.Controllers
 {

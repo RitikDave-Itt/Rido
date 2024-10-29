@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Rido.Data.Contexts;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using Rido.Data.Repositories.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -47,7 +47,7 @@ namespace Rido.Data.Repositories
                 DriverId = rideRequest.DriverId,
                 Amount = rideRequest.MaxPrice,
                 Status = RideTransactionStatus.Completed,
-                Date = DateTime.Now
+                Date = DateTime.UtcNow
             };
 
             var rideBooking = new RideBooking
@@ -55,7 +55,7 @@ namespace Rido.Data.Repositories
                 UserId = rideRequest.UserId,
                 DriverId = rideRequest.DriverId,
                 PickupTime = rideRequest.PickupTime,
-                DropoffTime = DateTime.Now,
+                DropoffTime = DateTime.UtcNow,
                 PickupLatitude = rideRequest.PickupLatitude,
                 PickupLongitude = rideRequest.PickupLongitude,
                 PickupAddress = rideRequest.PickupAddress,
@@ -67,8 +67,8 @@ namespace Rido.Data.Repositories
                 GeohashCode = rideRequest.GeohashCode,
                 TransactionId = rideTransaction.Id,
                 Amount = rideTransaction.Amount,
-                CreatedAt = DateTime.Now,
-                UpdatedAt = DateTime.Now
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow
             };
 
             await using (var transaction = await _dbContext.Database.BeginTransactionAsync())
@@ -82,8 +82,8 @@ namespace Rido.Data.Repositories
                     driverWallet.Balance += rideRequest.MaxPrice;
                     _dbContext.RideRequests.Remove(rideRequest);
 
-                    riderWallet.UpdatedAt = DateTime.Now;
-                    driverWallet.UpdatedAt = DateTime.Now;
+                    riderWallet.UpdatedAt = DateTime.UtcNow;
+                    driverWallet.UpdatedAt = DateTime.UtcNow;
                     await _dbContext.SaveChangesAsync();
                   
                     await transaction.CommitAsync();

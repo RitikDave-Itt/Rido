@@ -1,12 +1,12 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Rido.Common.Exceptions;
-using Rido.Common.Models.Requests;
+using Rido.Model.Requests;
 using Rido.Common.Utils;
-using Rido.Data.DataTypes;
+using Rido.Model.DataTypes;
 using Rido.Data.DTOs;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using Rido.Services.Interfaces;
 
 namespace Rido.Web.Controllers
@@ -18,13 +18,11 @@ namespace Rido.Web.Controllers
     public class RideController : BaseController<RideController>
     {
         private readonly IRideService _rideService;
-        private readonly IBaseService<RideRequest> _rideRequestService;
 
 
-        public RideController(IRideService rideService, IServiceProvider serviceProvider, IBaseService<RideRequest> rideRequestService) : base(serviceProvider)
+        public RideController(IRideService rideService, IServiceProvider serviceProvider) : base(serviceProvider)
         {
             _rideService = rideService;
-            _rideRequestService = rideRequestService;
         }
 
 
@@ -86,6 +84,10 @@ namespace Rido.Web.Controllers
                 return StatusCode(409, new { Message = "Cannot Create Multiple Ride Request" });
 
 
+            }
+            catch(LowBalanceException ex)
+            {
+                return StatusCode(402, new { Message = "Low Balance" });
             }
             catch (Exception ex)
             {
@@ -167,35 +169,7 @@ namespace Rido.Web.Controllers
             }
         }
 
-        //[HttpGet("ride-confirm-detail/{rideRequestId}")]
-        //public async Task<IActionResult> GetRideAndDriverDetail(string rideRequestId)
-        //{
-        //    try
-        //    {
-        //        var rideAndDriverDetail = await _rideService.GetRideAndDriverDetail(rideRequestId);
-        //        if (rideAndDriverDetail != null)
-        //        {
-        //            return Ok(rideAndDriverDetail);
-        //        }
-        //        else
-        //        {
-        //            return NotFound(new { Message = "Ride Not Found Invalid Id" });
-        //        }
-
-        //    }
-        //    catch (DriverNotAssignedException ex)
-        //    {
-        //        return StatusCode(460, new { Message = "Driver not Assigned" });
-
-
-        //    }
-
-        //    catch (Exception ex)
-        //    {
-        //        _logger.LogError(ex, " error  while retrieving ride and driver details.");
-        //        return StatusCode(500, "Internal server error.");
-        //    }
-        //}
+     
 
         [HttpPost("verify-otp")]
         [Authorize(Roles = "Driver")]
@@ -207,9 +181,9 @@ namespace Rido.Web.Controllers
 
                 if (verify == OTPVerificationStatus.Success)
                 {
-                    var rideRequest = await _rideRequestService.GetByIdAsync(verifyOtpDto.RideRequestId);
+                    var rideRequest = await _rideService.GetByIdAsync(verifyOtpDto.RideRequestId);
                     rideRequest.Status = RideRequestStatus.InProgress;
-                    var updateRideRequest = await _rideRequestService.UpdateAsync(rideRequest);
+                    var updateRideRequest = await _rideService.UpdateAsync(rideRequest);
 
                     return Ok(new { Success = true });
 
@@ -243,7 +217,7 @@ namespace Rido.Web.Controllers
             var userId = GetCurrentUserId();
 
 
-            var rideRequest = await _rideRequestService.FindAsync(ride => ride.DriverId == userId, ride => ride.Rider);
+            var rideRequest = await _rideService.FindAsync(ride => ride.DriverId == userId, ride => ride.Rider);
 
             if (rideRequest == null)
             {
@@ -289,7 +263,7 @@ namespace Rido.Web.Controllers
             var userId = GetCurrentUserId();
 
 
-            var rideRequest = await _rideRequestService.FindAsync(ride => ride.UserId == userId, ride => ride.Driver, ride => ride.Driver.location);
+            var rideRequest = await _rideService.FindAsync(ride => ride.UserId == userId, ride => ride.Driver, ride => ride.Driver.location);
 
             if (rideRequest == null)
             {
@@ -325,7 +299,7 @@ namespace Rido.Web.Controllers
 
                         }
                     ,
-                        driver = rideRequest?.Status==RideRequestStatus.Accepted ? new
+                        driver = rideRequest?.Status==RideRequestStatus.Accepted||rideRequest.Status==RideRequestStatus.InProgress ? new
                         {
                             id = rideRequest?.Driver?.Id,
                             driverName = $"{rideRequest?.Driver.FirstName} {rideRequest?.Driver.LastName}",
@@ -350,12 +324,28 @@ namespace Rido.Web.Controllers
             try
             {
                 var userID = GetCurrentUserId();
-                var rideRequest = await _rideRequestService.FindAsync(ride=>ride.UserId == userID);
-                if (rideRequest != null)
+                var Role = GetCurrentUserRole();
+                if (Role == UserRole.User.ToString())
                 {
-                    return Ok(rideRequest.Status.ToString());
+                    var rideRequest = await _rideService.FindAsync(ride => ride.UserId == userID);
+                    if (rideRequest != null)
+                    {
+                        return Ok(rideRequest.Status.ToString());
+                    }
+                    return NotFound();
+                }else if(Role == UserRole.Driver.ToString())
+                {
+                    var rideRequest = await _rideService.FindAsync(ride => ride.DriverId == userID);
+                    if (rideRequest != null)
+                    {
+                        return Ok(rideRequest.Status.ToString());
+                    }
+                    return NotFound();
+
+
                 }
                 return NotFound();
+
             }
             catch (Exception ex)
             {
@@ -363,6 +353,42 @@ namespace Rido.Web.Controllers
                 return StatusCode(500, "Internal server error.");
             }
         }
+        [HttpPut("completed")]
+        [Authorize(Roles ="Driver")]
+
+        public async Task<IActionResult> UpdateStatus()
+        {
+            try
+            {
+                
+
+                var userId = GetCurrentUserId();
+
+                var rideRequest = await _rideService.FindAsync(ride => ride.DriverId == userId);
+
+                if (rideRequest == null)
+                {
+                    return NotFound("Ride request not found");
+                }
+
+                rideRequest.Status = RideRequestStatus.Completed;
+                var updateStatus = await _rideService.UpdateAsync(rideRequest);
+
+                if (!updateStatus)
+                {
+                    return StatusCode(500,"failed To Update");
+                }
+
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "An error occurred");
+                return StatusCode(500, "An error occurred on Ride Status InProgress");
+            }
+        }
+
+
 
 
 

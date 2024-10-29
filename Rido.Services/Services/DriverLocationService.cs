@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Geohash;
 using Microsoft.AspNetCore.Http;
-using Rido.Data.DataTypes;
+using Rido.Model.DataTypes;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using Rido.Data.Repositories.Interfaces;
 using Rido.Services.Interfaces;
 

@@ -5,7 +5,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using AutoMapper.Configuration.Annotations;
 using System.Text.Json.Serialization;
 

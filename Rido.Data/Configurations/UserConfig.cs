@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Rido.Data.Entities;
 
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 
 namespace Rido.Data.Configurations
 {

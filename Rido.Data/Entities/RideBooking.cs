@@ -1,5 +1,5 @@
 ﻿using AutoMapper.Configuration.Annotations;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -41,8 +41,8 @@ namespace Rido.Data.Entities
 
     
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;     
-        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;     
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
 
         public User? User { get; set; }

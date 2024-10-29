@@ -1,6 +1,6 @@
-﻿using Rido.Common.Models.Requests;
-using Rido.Common.Models.Responses;
-using Rido.Data.Enums;
+﻿using Rido.Model.Requests;
+using Rido.Model.Responses;
+using Rido.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

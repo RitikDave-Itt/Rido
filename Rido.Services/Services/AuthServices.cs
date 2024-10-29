@@ -1,17 +1,17 @@
-﻿using Rido.Common.Models.Requests;
+﻿using Rido.Model.Requests;
 using Rido.Common.Utils;
 using Rido.Data.Entities;
 using Rido.Data.Repositories.Interfaces;
 using System.Threading.Tasks;
 using Rido.Services.Interfaces;
-using Rido.Common.Models.Responses;
+using Rido.Model.Responses;
 using AutoMapper;
 using Rido.Data.Contexts;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using System.Text.RegularExpressions;
 using Rido.Common.Secrets;
 using Microsoft.Extensions.Options;
-using Rido.Common.Attributes;
+using Rido.Model.Attributes;
 
 
 namespace Rido.Services
@@ -73,7 +73,7 @@ namespace Rido.Services
                 {
                     Token = token,
                     UserId = user.Id,
-                    Expiry = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpiryInDays)
+                    Expiry = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryInDays)
                 };
                 var result = await _refreshTokenRepository.AddAsync(refreshToken);
                 refreshToken = result;
@@ -81,7 +81,7 @@ namespace Rido.Services
             else
             {
                 existingRefreshToken.Token = token;
-                existingRefreshToken.Expiry = DateTime.Now.AddDays(_jwtSettings.RefreshTokenExpiryInDays);
+                existingRefreshToken.Expiry = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryInDays);
 
                 bool updateSuccess = await _refreshTokenRepository.UpdateAsync(existingRefreshToken);
 
@@ -162,7 +162,7 @@ namespace Rido.Services
             var refreshToken = await _refreshTokenRepository.FindAsync(t => t.Token==token, t=>t.User);
 
 
-            if(refreshToken == null || refreshToken.IsRevoked || refreshToken.Expiry < DateTime.Now||refreshToken.User==null) 
+            if(refreshToken == null || refreshToken.IsRevoked || refreshToken.Expiry < DateTime.UtcNow||refreshToken.User==null) 
             {
                 return (
                     IsValid : false,

@@ -1,6 +1,6 @@
 ﻿//using Microsoft.EntityFrameworkCore;
 //using Rido.Data.Contexts;
-//using Rido.Data.Enums;
+//using Rido.Model.Enums;
 //using Rido.Data.Repositories.Interfaces;
 //using System;
 //using System.Collections.Generic;

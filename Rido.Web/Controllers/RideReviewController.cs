@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using NetTopologySuite.Operation.Valid;
 using Rido.Common.Exceptions;
-using Rido.Common.Models.Requests;
+using Rido.Model.Requests;
 using Rido.Services.Interfaces;
 
 namespace Rido.Web.Controllers

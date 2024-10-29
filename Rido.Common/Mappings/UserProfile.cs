@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
-using Rido.Common.Models.Requests;
+using Rido.Model.Requests;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using System.Text.Json;
 
 namespace Rido.Common.Mappings

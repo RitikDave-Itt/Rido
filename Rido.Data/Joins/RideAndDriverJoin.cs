@@ -1,4 +1,4 @@
-﻿using Rido.Data.Enums;
+﻿using Rido.Model.Enums;
 
 public class RideAndDriverDetailJoin
 {

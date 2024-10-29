@@ -1,5 +1,5 @@
 ﻿using AutoMapper.Configuration.Annotations;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,8 +15,8 @@ namespace Rido.Data.Entities
         public decimal Balance { get; set; }
         public string UserId { get; set; }
 
-        public DateTime CreatedAt { get; set; } = DateTime.Now;
-        public DateTime UpdatedAt { get; set; } = DateTime.Now;
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
 
         public WalletStatus WalletStatus { get; set; } = WalletStatus.Active;
 

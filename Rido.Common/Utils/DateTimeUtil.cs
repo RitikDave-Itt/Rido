@@ -10,7 +10,7 @@ namespace Rido.Common.Utils
     {
         public static DateTime CurrentDateTime()
         {
-            return DateTime.Now;
+            return DateTime.UtcNow;
 
         }
 

@@ -1,8 +1,8 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using Rido.Common.Attributes;
+using Rido.Model.Attributes;
 using Rido.Common.Utils;
 using Rido.Data.Entities;
-using Rido.Data.Enums;
+using Rido.Model.Enums;
 using Rido.Data.Repositories.Interfaces;
 using Rido.Services.Interfaces;
 using System;
@@ -26,8 +26,7 @@ namespace Rido.Services
 
             var user = await _repository.FindAsync(
                 u => u.Id == userId,
-                u=>u.DriverData
-            
+                u=>u.DriverData            
             );
 
             if (user == null)
@@ -46,6 +45,7 @@ namespace Rido.Services
                         Email = user.Email,
                         Gender = user.Gender.ToString(),
                         Role = user.Role.ToString(),
+                       
                     },
                   
                 };
