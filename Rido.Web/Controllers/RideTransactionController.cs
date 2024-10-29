@@ -13,12 +13,10 @@ namespace Rido.Web.Controllers
     public class RideTransactionController:BaseController<RideTransactionController>
     {
         private IRideTransactionService _rideTransactionService;
-        private IBaseService<RideTransaction> _transactionBaseService;
         
-        public RideTransactionController(IServiceProvider serviceProvider ,IRideTransactionService rideTransactionService ,IBaseService<RideTransaction> transactionBaseService) :base(serviceProvider) 
+        public RideTransactionController(IServiceProvider serviceProvider ,IRideTransactionService rideTransactionService) :base(serviceProvider) 
         {
             _rideTransactionService = rideTransactionService;
-            _transactionBaseService = transactionBaseService;
         }
 
 
@@ -55,16 +53,21 @@ namespace Rido.Web.Controllers
                 var userId = GetCurrentUserId();
 
 
-                var transaction = await _transactionBaseService.FindAsync(rt => rt.RideRequestId == rideRequestId);
+                var rideRequest = await _rideTransactionService.FindAsync(rt => rt.Status == RideRequestStatus.Completed);
 
-                if (transaction == null)
+                if (rideRequest.Status == RideRequestStatus.Unpaid)
                 {
                     return Ok(RideTransactionStatus.Pending.ToString());
                 }
-                else
+                else if(rideRequest.Status==RideRequestStatus.Completed) 
                 {
                     return Ok(RideTransactionStatus.Completed.ToString());
                 }
+                else
+                {
+                    return BadRequest();
+                }
+                
             }
             catch (Exception ex)
             {
@@ -80,10 +83,10 @@ namespace Rido.Web.Controllers
         {
             try
             {
-                var transaction = await _transactionBaseService.FindAsync(rt => rt.RideRequestId == rideRequestId, rt => rt.Rider);
+                var rideRequest = await _rideTransactionService.FindAsync(rr=>rr.Id == rideRequestId, rr => rr.Rider,RedirectResult=>RedirectResult.RideTransaction);
 
 
-                if (transaction == null)
+                if (rideRequest == null)
                 {
                     return NotFound();
                 }
@@ -91,11 +94,11 @@ namespace Rido.Web.Controllers
                 {
                     return Ok(new
                     {
-                        amount = transaction.Amount,
-                        riderName = $"{transaction.Rider.FirstName} {transaction.Rider.LastName}",
-                        transactionId = transaction.Id,
-                        transactionStatus = transaction.Status.ToString(),
-                        createdAt = transaction.Date
+                        amount = rideRequest.Amount,
+                        riderName = $"{rideRequest.Rider.FirstName} {rideRequest.Rider.LastName}",
+                        transactionId = rideRequest.Id,
+                        transactionStatus = rideRequest.RideTransaction.Status.ToString(),
+                        createdAt = rideRequest?.RideTransaction.Date
                     });
                 }
             }

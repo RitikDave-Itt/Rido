@@ -14,17 +14,16 @@ namespace Rido.Services.Services
 {
     public class RideReviewService : BaseService<RideReview> ,IRideReviewService
     {
-        public IBaseRepository<RideReview> _rideReviewRepository;
-        public IBaseRepository<RideBooking> _rideBookingRepository;
+        private IBaseRepository<RideRequest> _rideRequestRepository;
 
-        public RideReviewService(IBaseRepository<RideReview> rideReviewRepo, IBaseRepository<RideBooking> rideBookingRepository ,IServiceProvider serviceProvider) :base(serviceProvider){
-            _rideBookingRepository = rideBookingRepository;
-        _rideReviewRepository = rideReviewRepo;
+        public RideReviewService(IBaseRepository<RideRequest>rideRequestRepositor, IServiceProvider serviceProvider) :base(serviceProvider){
+
+            _rideRequestRepository = rideRequestRepositor; 
         }
 
         public async Task<string> CreateReview(RideReviewRequestDto reviewDto)
         {
-            var booking = await _rideBookingRepository.GetByIdAsync(reviewDto.BookingId);
+            var booking = await _rideRequestRepository.GetByIdAsync(reviewDto.BookingId);
 
             if (booking == null) {
                 return null;
@@ -32,22 +31,22 @@ namespace Rido.Services.Services
             }
             var userId = GetCurrentUserId();
 
-            if (userId != booking.UserId)
+            if (userId != booking.RiderId)
             {
                 throw new NotValidUserException("Not Valid User");
             }
 
             RideReview review = new RideReview()
             {
-                BookingId = booking.Id,
+                RideRequestId = booking.Id,
                 Rating = reviewDto.Rating,
                 Comment = reviewDto.Comment,
                 DriverId = booking.DriverId,
-                UserId = booking.UserId,
+                UserId = booking.RiderId,
 
             };
 
-            var result  = await _rideReviewRepository.AddAsync(review);
+            var result = await _repository.AddAsync(review);
 
             return result!=null ? result.Id : null;
 

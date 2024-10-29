@@ -15,7 +15,7 @@ namespace Rido.Model.Requests
 
             [Required]
             [Range(100, double.MaxValue, ErrorMessage = "Amount must be greater than 100")]
-            public decimal Amount { get; set; }
+            public double Amount { get; set; }
 
 
 

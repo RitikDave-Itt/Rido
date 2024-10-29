@@ -73,6 +73,7 @@ namespace Rido.Web.Controllers
                 {
                     return BadRequest(ModelState);
                 }
+                
 
 
                 var result = await _rideService.CreateRideRequest(rideRequest);
@@ -239,7 +240,7 @@ namespace Rido.Web.Controllers
                         destinationLatitude = rideRequest.DestinationLatitude,
                         destinationLongitude = rideRequest.DestinationLongitude,
                         destinationAddress = rideRequest.DestinationAddress,
-                        price = rideRequest.MaxPrice,
+                        price = rideRequest.Amount,
                         vehicleType = rideRequest.VehicleType.ToString(),
 
                         geohashCode = rideRequest.GeohashCode,
@@ -263,7 +264,7 @@ namespace Rido.Web.Controllers
             var userId = GetCurrentUserId();
 
 
-            var rideRequest = await _rideService.FindAsync(ride => ride.UserId == userId, ride => ride.Driver, ride => ride.Driver.location);
+            var rideRequest = await _rideService.FindAsync(ride => ride.RiderId == userId, ride => ride.Driver, ride => ride.Driver.location);
 
             if (rideRequest == null)
             {
@@ -289,7 +290,7 @@ namespace Rido.Web.Controllers
                             destinationLatitude = rideRequest.DestinationLatitude,
                             destinationLongitude = rideRequest.DestinationLongitude,
                             destinationAddress = rideRequest.DestinationAddress,
-                            price = rideRequest.MaxPrice,
+                            price = rideRequest.Amount,
                             vehicleType = rideRequest.VehicleType.ToString(),
 
                             geohashCode = rideRequest.GeohashCode,
@@ -327,7 +328,7 @@ namespace Rido.Web.Controllers
                 var Role = GetCurrentUserRole();
                 if (Role == UserRole.User.ToString())
                 {
-                    var rideRequest = await _rideService.FindAsync(ride => ride.UserId == userID);
+                    var rideRequest = await _rideService.FindAsync(ride => ride.RiderId == userID);
                     if (rideRequest != null)
                     {
                         return Ok(rideRequest.Status.ToString());

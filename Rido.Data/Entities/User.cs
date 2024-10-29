@@ -24,7 +24,6 @@ namespace Rido.Data.Entities
 
         public DriverData? DriverData { get; set; } 
 
-        public RideRequest? RideRequest { get; set; }
         public Wallet Wallet { get; set; }
 
         public DriverLocation? location { get; set; } 

@@ -17,18 +17,15 @@ namespace Rido.Services
     {
 
         private IBaseRepository<DriverLocation> _driverLocationRepository;
-        private IBaseRepository<RideRequest> _rideRequestRepository;
         private IBaseRepository<User> _userRepository;
 
 
         public RideService( IBaseRepository<DriverLocation> driverLocationRepository
-            ,IBaseRepository<RideRequest> rideRequestRepository
             ,IServiceProvider serviceProvider
             ,IBaseRepository<User> userRepository
             ) : base(serviceProvider)
         {
             _driverLocationRepository = driverLocationRepository;
-            _rideRequestRepository = rideRequestRepository;
             _userRepository = userRepository;
         }
 
@@ -39,7 +36,13 @@ namespace Rido.Services
 
             
 
-            var checkRide = _repository.FindAsync(ride => ride.UserId == currentUserId);
+            var checkRide = _repository.FindAsync(ride => ride.RiderId == currentUserId||
+            ride.Status==RideRequestStatus.Requested||
+            ride.Status==RideRequestStatus.Accepted||
+            ride.Status==RideRequestStatus.InProgress||
+            ride.Status==RideRequestStatus.Unpaid
+
+            );
             if (checkRide.Result != null)
             {
                 throw new ALreadyRideExistsException();
@@ -70,13 +73,12 @@ namespace Rido.Services
             );
             double[] fare = rideCalculations.CalculateFare(rideRequest.DistanceInKm, rideRequest.VehicleType);
 
-            rideRequest.MinPrice = (decimal)fare[0];
-            rideRequest.MaxPrice = (decimal)fare[1];
+            rideRequest.Amount = (double)fare[1];
 
             var user = await _userRepository.FindAsync(u => u.Id == currentUserId, u => u.Wallet);
 
             
-            if (user != null&&user.Wallet.Balance < rideRequest.MaxPrice)
+            if (user != null&&user.Wallet.Balance < rideRequest.Amount)
             {
                 throw new LowBalanceException();
                   
@@ -90,7 +92,7 @@ namespace Rido.Services
             
 
 
-            rideRequest.UserId = currentUserId;
+            rideRequest.RiderId = currentUserId;
             var SavedRideRequest = await _repository.AddAsync(rideRequest);
 
             var createdRideRequest = await _repository.GetByIdAsync(SavedRideRequest.Id);
@@ -125,10 +127,22 @@ namespace Rido.Services
 
             string currentUserId = GetCurrentUserId();
 
+            var rideRequest = await _repository.GetByIdAsync(RideRequestId);
 
-            bool result = await _repository.DeleteAsync(RideRequestId);
+            if (rideRequest == null)
+            {
+                return false;
+            }
 
-            return result;
+            rideRequest.Status= RideRequestStatus.Canceled;
+            rideRequest.CancelBy = UserRole.User;
+            var update = await _repository.UpdateAsync(rideRequest);
+
+
+
+
+
+            return update;
         }
 
         public async Task<bool> CancelRideByDriver(string rideRequestId)
@@ -136,8 +150,14 @@ namespace Rido.Services
 
 
             var rideRequest = await _repository.GetByIdAsync(rideRequestId);
-            rideRequest.Status = RideRequestStatus.Requested;
-            rideRequest.DriverId = null;
+
+            if (rideRequest == null)
+            {
+                return false;
+            }
+           
+            rideRequest.Status = RideRequestStatus.Canceled;
+            rideRequest.CancelBy= UserRole.Driver;
 
             bool result = await _repository.UpdateAsync(rideRequest);
 
@@ -150,7 +170,23 @@ namespace Rido.Services
         {
             string currentUserId = GetCurrentUserId();
 
+
+
+            var checkRide =await  _repository.FindAsync(ride => ride.RiderId == currentUserId ||
+            ride.Status == RideRequestStatus.Requested ||
+            ride.Status == RideRequestStatus.Accepted ||
+            ride.Status == RideRequestStatus.InProgress ||
+            ride.Status == RideRequestStatus.Unpaid
+
+            );
+            if (checkRide!=null)
+            {
+                throw new ALreadyRideExistsException();
+            }
+
             var rideRequest = await _repository.GetByIdAsync(rideRequestId);
+
+            
 
             if(rideRequest.DriverId != null || rideRequest.Status != RideRequestStatus.Requested)
             {
@@ -169,7 +205,7 @@ namespace Rido.Services
 
         public async Task<dynamic> GetRideAndDriverDetail(string rideRequestId)
         {
-            var result = await _rideRequestRepository.FindAsync(r=>r.Id==rideRequestId, result=>result.Driver.location,r=>r.Driver.DriverData);
+            var result = await _repository.FindAsync(r=>r.Id==rideRequestId, result=>result.Driver.location,r=>r.Driver.DriverData);
 
             if (result == null)
             {
@@ -212,7 +248,7 @@ namespace Rido.Services
 
             }
 
-            var rideRequest = await _rideRequestRepository.GetByIdAsync(rideRequestId);
+            var rideRequest = await _repository.GetByIdAsync(rideRequestId);
 
             if (rideRequest == null || rideRequest.Status != RideRequestStatus.Accepted || rideRequest.DriverId != UserId)
             {
@@ -221,7 +257,7 @@ namespace Rido.Services
 
             rideRequest.Status = RideRequestStatus.InProgress;
 
-            var update = await _rideRequestRepository.UpdateAsync(rideRequest);
+            var update = await _repository.UpdateAsync(rideRequest);
 
 
 

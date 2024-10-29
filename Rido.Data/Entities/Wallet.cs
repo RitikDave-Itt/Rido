@@ -12,7 +12,7 @@ namespace Rido.Data.Entities
     public class Wallet
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();
-        public decimal Balance { get; set; }
+        public double Balance { get; set; }
         public string UserId { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

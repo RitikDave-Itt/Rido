@@ -10,7 +10,8 @@ namespace Rido.Model.Enums
     {
         Requested,              
         Accepted,               
-        InProgress,            
+        InProgress,   
+        Unpaid,
         Completed,            
         Canceled,                  
         Failed                  

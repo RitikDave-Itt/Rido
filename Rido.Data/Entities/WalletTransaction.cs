@@ -7,7 +7,7 @@ namespace Rido.Data.Entities
     {
         public string Id { get; set; } = Guid.NewGuid().ToString();      
         public string UserId { get; set; }          
-        public decimal Amount { get; set; }      
+        public double Amount { get; set; }      
         public WalletTransactionType Type { get; set; }
         public WalletTransactionStatus Status { get; set; } = WalletTransactionStatus.Completed;        
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;        
@@ -20,5 +20,5 @@ namespace Rido.Data.Entities
         public User User { get; set; }
     }
 
-  
+    
 }

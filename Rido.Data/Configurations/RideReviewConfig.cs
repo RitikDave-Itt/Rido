@@ -36,12 +36,12 @@ namespace Rido.Data.Configurations
                 .OnDelete(DeleteBehavior.NoAction);
             builder.HasOne(rr=>rr.Booking)
                 .WithOne()
-                .HasForeignKey<RideReview>(rr=>rr.BookingId)
+                .HasForeignKey<RideReview>(rr=>rr.RideRequestId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasIndex(rr => rr.UserId);
             builder.HasIndex(rr => rr.DriverId);
-            builder.HasIndex(rr => rr.BookingId);
+            builder.HasIndex(rr => rr.RideRequestId);
 
 
 

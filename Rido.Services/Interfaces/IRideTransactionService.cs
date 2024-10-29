@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Rido.Services.Interfaces
 {
-    public interface IRideTransactionService 
+    public interface IRideTransactionService:IBaseService<RideRequest>
     { 
         Task<string> SpendTransaction(string rideRequestId);
 

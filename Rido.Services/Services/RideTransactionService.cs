@@ -14,9 +14,7 @@ namespace Rido.Services
     public class RideTransactionService : BaseService<RideRequest> ,IRideTransactionService
     {
 
-        private IBaseRepository<RideBooking> _rideBookingRepository;
-        public RideTransactionService(IServiceProvider serviceProvider ,IBaseRepository<RideBooking> rideBookingRepository ) : base(serviceProvider) { 
-            _rideBookingRepository = rideBookingRepository;
+        public RideTransactionService(IServiceProvider serviceProvider  ) : base(serviceProvider) { 
         }
 
         public async  Task<string> SpendTransaction(string rideRequestId)
@@ -29,58 +27,37 @@ namespace Rido.Services
             ,ride=>ride.Driver.Wallet
             
             );
-            if (rideRequest == null||rideRequest.Rider.Wallet.Balance < rideRequest.MaxPrice) {
+            if (rideRequest == null||rideRequest.Rider.Wallet.Balance < rideRequest.Amount) {
                 return null;
             }
 
-            rideRequest.Rider.Wallet.Balance -= rideRequest.MaxPrice;
+            rideRequest.Rider.Wallet.Balance -= rideRequest.Amount;
 
-            rideRequest.Driver.Wallet.Balance += rideRequest.MaxPrice;
+            rideRequest.Driver.Wallet.Balance += rideRequest.Amount;
 
 
             var transaction = new RideTransaction()
             {
-                UserId = rideRequest.UserId,
+                UserId = rideRequest.RiderId,
                 DriverId = rideRequest.DriverId,
                 Status = RideTransactionStatus.Completed,
-                Amount = rideRequest.MaxPrice,
+                Amount = rideRequest.Amount,
                 Remarks ="",
                 Rider = rideRequest.Rider,
                 Driver = rideRequest.Driver,
-                RideRequestId = rideRequestId
 
             };
+            rideRequest.Status = RideRequestStatus.Completed;
+            rideRequest.RideTransaction = transaction;
 
-            var booking = new RideBooking()
-            {
-                RideTransaction = transaction,
-                UserId = rideRequest.UserId,
-                DriverId = rideRequest?.DriverId,
-                TransactionId = transaction.Id,
-                PickupTime = rideRequest.PickupTime,
-                DropoffTime = DateTime.UtcNow,
-                PickupLatitude = rideRequest.PickupLatitude,
-                PickupLongitude = rideRequest.PickupLongitude,
-                PickupAddress = rideRequest.PickupAddress,
-                DestinationLatitude = rideRequest.DestinationLatitude,
-                DestinationLongitude = rideRequest.DestinationLongitude,
-                DestinationAddress = rideRequest.DestinationAddress,
-                VehicleType = rideRequest.VehicleType,
-                DistanceInKm = rideRequest.DistanceInKm,
-                GeohashCode = rideRequest.GeohashCode,
-                Amount = rideRequest.MaxPrice,
+         
 
-
-
-            };
-            var deleteRideRequest = await _repository.DeleteAsync(rideRequestId);
-
-            var result = await _rideBookingRepository.AddAsync(booking);
+            var result = await _repository.UpdateAsync(rideRequest);
 
 
             
             
-            return  result.Id;
+            return  rideRequest.Id;
 
         }
 

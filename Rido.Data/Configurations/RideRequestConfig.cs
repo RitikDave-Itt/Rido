@@ -17,17 +17,15 @@ namespace Rido.Data.Configurations
 
             builder.HasKey(rr => rr.Id);
 
-            builder.Property(rr => rr.UserId)
-                .IsRequired(true);
+            builder.Property(rr => rr.RiderId)
+                .IsRequired(false);
 
-            builder.HasIndex(rr => rr.UserId)
-                .IsUnique();
+            builder.HasIndex(rr => rr.RiderId);
 
             builder.Property(rr => rr.DriverId)
                 .IsRequired(false);
 
-            builder.HasIndex(rr=>rr.DriverId)
-                .IsUnique();
+            builder.HasIndex(rr => rr.DriverId);
                 
 
             builder.Property(rr => rr.PickupLatitude)
@@ -51,42 +49,41 @@ namespace Rido.Data.Configurations
             builder.Property(rr => rr.DestinationAddress)
                    .IsRequired();
 
-            builder.Property(rr => rr.MinPrice)
+            builder.Property(rr => rr.Amount)
                    .IsRequired();
+            
 
-            builder.Property(rr => rr.MaxPrice)
-                   .IsRequired();
 
             builder.Property(rr => rr.VehicleType)
                    .IsRequired()
                    .HasConversion<int>();
 
-            builder.Property(rr => rr.GeohashCode)
-                   .IsRequired();
-
+           
             builder.Property(rr => rr.DistanceInKm)
                    .IsRequired();
 
             builder.HasIndex(rr => rr.VehicleType);
-            builder.HasIndex(rr => rr.GeohashCode);
 
-            builder.Property(rr => rr.MinPrice)
+            builder.Property(rr => rr.Amount)
                    .HasColumnType("decimal(18,2)");
 
-            builder.Property(rr => rr.MaxPrice)
-                   .HasColumnType("decimal(18,2)");
+         
             builder.Property(rr => rr.Status)
                   .IsRequired()
                   .HasConversion<int>();
 
             builder.HasOne(rr=>rr.Rider)
-                .WithOne(u=>u.RideRequest)
-                .HasForeignKey<RideRequest>(rr => rr.UserId)
+                .WithMany()
+                .HasForeignKey(rr => rr.RiderId)
                 .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasOne(rr=>rr.Driver)
-                .WithOne()
-                .HasForeignKey<RideRequest>(rr => rr.DriverId)
+                .WithMany()
+                .HasForeignKey(rr => rr.DriverId)
+                .OnDelete(DeleteBehavior.NoAction);
+            builder.HasOne(rr=>rr.RideTransaction)
+                .WithMany()
+                .HasForeignKey(rr=>rr.TransactionId)
                 .OnDelete(DeleteBehavior.NoAction);
                 
         }

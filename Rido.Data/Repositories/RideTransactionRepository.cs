@@ -28,7 +28,7 @@ namespace Rido.Data.Repositories
                 throw new ArgumentException("Requested Ride not Found.");
             }
 
-            var riderWallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.UserId == rideRequest.UserId);
+            var riderWallet = await _dbContext.Wallets.FirstOrDefaultAsync(w => w.UserId == rideRequest.RiderId);
             var driverWallet = await _dbContext.Wallets.FirstOrDefaultAsync(w=>w.UserId == rideRequest.DriverId);
             
             if (riderWallet == null)
@@ -36,23 +36,23 @@ namespace Rido.Data.Repositories
                 throw new ArgumentException("Wallet not Found!");
             }
 
-            if (riderWallet.Balance < rideRequest.MaxPrice)
+            if (riderWallet.Balance < rideRequest.Amount)
             {
                 throw new InvalidOperationException("Low Wallet Balance!");
             }
 
             var rideTransaction = new RideTransaction
             {
-                UserId = rideRequest.UserId,
+                UserId = rideRequest.RiderId,
                 DriverId = rideRequest.DriverId,
-                Amount = rideRequest.MaxPrice,
+                Amount = rideRequest.Amount,
                 Status = RideTransactionStatus.Completed,
                 Date = DateTime.UtcNow
             };
 
-            var rideBooking = new RideBooking
+            var rideBooking = new RideRequest
             {
-                UserId = rideRequest.UserId,
+                RiderId = rideRequest.RiderId,
                 DriverId = rideRequest.DriverId,
                 PickupTime = rideRequest.PickupTime,
                 DropoffTime = DateTime.UtcNow,
@@ -76,10 +76,9 @@ namespace Rido.Data.Repositories
                 try
                 {
                     await _dbContext.RideTransactions.AddAsync(rideTransaction);
-                    await _dbContext.RideBookings.AddAsync(rideBooking);
 
-                    riderWallet.Balance -= rideRequest.MaxPrice;
-                    driverWallet.Balance += rideRequest.MaxPrice;
+                    riderWallet.Balance -= rideRequest.Amount;
+                    driverWallet.Balance += rideRequest.Amount;
                     _dbContext.RideRequests.Remove(rideRequest);
 
                     riderWallet.UpdatedAt = DateTime.UtcNow;

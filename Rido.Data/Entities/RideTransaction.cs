@@ -8,11 +8,10 @@ namespace Rido.Data.Entities
         public string Id { get; set; } = Guid.NewGuid().ToString();       
         public string? UserId { get; set; }      
         public string? DriverId { get; set; }     
-        public decimal Amount { get; set; }      
+        public double Amount { get; set; }      
         public DateTime Date { get; set; } = DateTime.UtcNow;       
         public RideTransactionStatus Status { get; set; }       
         public string Remarks { get; set; }   
-        public string RideRequestId { get; set; }
 
         public User? Rider { get; set; }
 

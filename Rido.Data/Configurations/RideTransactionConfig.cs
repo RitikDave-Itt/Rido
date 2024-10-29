@@ -27,16 +27,11 @@ namespace Rido.Data.Configurations
             builder.Property(rt => rt.Status)
                 .IsRequired();
 
-            builder.Property(rt => rt.RideRequestId)
-               .IsRequired();
-
-            builder.HasIndex(rt => rt.RideRequestId)
-                .IsUnique();
-
+           
             builder.Property(rt => rt.Remarks)
                 .IsRequired(false);    
 
-            builder.HasOne<User>(rt=>rt.Rider)      
+            builder.HasOne(rt=>rt.Rider)      
                 .WithMany()        
                 .HasForeignKey(rt => rt.UserId)
                 .OnDelete(DeleteBehavior.NoAction);       
