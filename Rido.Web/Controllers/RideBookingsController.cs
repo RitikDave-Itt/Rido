@@ -9,7 +9,7 @@ namespace Rido.Web.Controllers
     
         [ApiController]
         [Route("api/bookings")]
-    [Authorize]    
+        [Authorize]    
         public class RideBookingsController : BaseController<RideBookingsController>
         {
             private readonly IRideService _rideBookingService;
@@ -74,7 +74,92 @@ namespace Rido.Web.Controllers
             }
 
             }
+
+        [HttpGet("get-by-id/{rideRequestId}")]
+
+        public async Task<IActionResult> GetByIdAsync(string rideRequestId)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                var userRole = GetCurrentUserRole();
+
+                var rideRequest = await _rideBookingService.FindAsync(rr => rr.Id == rideRequestId, rr => rr.Driver, rr => rr.Rider);
+
+                if(rideRequest == null)
+                {
+                    return NotFound();
+                }
+
+                var rideRequestData = new
+                {
+                    id = rideRequest.Id,
+                    riderId = rideRequest.RiderId,
+                    driverId = rideRequest.DriverId,
+                    pickupAddress = rideRequest.PickupAddress,
+                    pickupLatitude = rideRequest.PickupLatitude,
+                    pickupLongitude = rideRequest.PickupLongitude,
+                    pickupTime = rideRequest.PickupTime,
+                    dropoffAddress = rideRequest.DestinationAddress,
+                    destinationLatitude = rideRequest.DestinationLatitude,
+                    destinationLongitude = rideRequest.DestinationLongitude,
+                    dropoffTime = rideRequest.DropoffTime,
+                    status = rideRequest.Status.ToString(),
+                    vehicleType = rideRequest.VehicleType.ToString(),
+                    distanceInKm = rideRequest.DistanceInKm,
+                    amount = rideRequest.Amount,
+                    transactionId = rideRequest.TransactionId,
+                    createdAt = rideRequest.CreatedAt,
+                    updatedAt = rideRequest.UpdatedAt,
+                    cancelBy = rideRequest.CancelBy.ToString(),
+                    cancelReason = rideRequest.CancelReason,
+
+                };
+
+
+                if (userRole == UserRole.User.ToString())
+                {
+                    return Ok(new
+                    {
+                        bookingData = rideRequestData,
+                        driver = rideRequest.Driver != null ? new
+                        {
+                            name = $"{rideRequest.Driver.FirstName} {rideRequest.Driver.LastName}"
+                        } : null,
+
+                        
+                    });
+
+                }
+                else if(userRole == UserRole.Driver.ToString())
+                {
+                    return Ok(new
+                    {
+                        bookingData = rideRequestData,
+                        rider = rideRequest.Rider != null ? new
+                        {
+                            name = $"{rideRequest.Rider.FirstName} {rideRequest.Rider.LastName}"
+                        } : null,
+
+
+                    });
+
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            catch(Exception ex)
+            {
+                _logger.LogError(ex, "Exception In Fetching Data of Ride Request");
+                return BadRequest();
+            }
         }
+
+
+        }
+
     }
 
 

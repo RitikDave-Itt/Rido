@@ -361,6 +361,7 @@ namespace Rido.Web.Controllers
                 }
 
                 rideRequest.Status = RideRequestStatus.Unpaid;
+                rideRequest.DropoffTime = DateTime.UtcNow;
                 var updateStatus = await _rideService.UpdateAsync(rideRequest);
 
                 if (!updateStatus)

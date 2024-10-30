@@ -18,7 +18,8 @@ namespace Rido.Common.Mappings
                             .ForMember(dest => dest.Amount, opt => opt.MapFrom(src => (decimal)src.Amount))
                             .ForMember(dest => dest.PickupAddress, opt => opt.MapFrom(src => src.PickupAddress))
                             .ForMember(dest => dest.DestinationAddress, opt => opt.MapFrom(src => src.DestinationAddress))
-                            .ForMember(dest => dest.PickupTime, opt => opt.MapFrom(src => src.PickupTime));
+                            .ForMember(dest => dest.PickupTime, opt => opt.MapFrom(src => src.PickupTime))
+                            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
         
     }
     }
