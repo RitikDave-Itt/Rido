@@ -17,5 +17,10 @@ namespace Rido.Data.Repositories.Interfaces
         Task<(IEnumerable<T> Items, int TotalCount)> FindPageAsync(Expression<Func<T, bool>> predicate, int pageSige, int pageNo, List<Func<IQueryable<T>, IOrderedQueryable<T>>> orderBys = null
 , params Expression<Func<T, object>>[] includes);
 
+        Task<bool> AnyAsync(Expression<Func<T, bool>> predicate);
+        Task<int> CountAsync(Expression<Func<T, bool>> predicate = null);
+
+
+
     }
 }

@@ -53,7 +53,7 @@ namespace Rido.Web.Controllers
                 var userId = GetCurrentUserId();
 
 
-                var rideRequest = await _rideTransactionService.FindAsync(rt => rt.Status == RideRequestStatus.Completed);
+                var rideRequest = await _rideTransactionService.FindAsync(rr=>rr.Id == rideRequestId);
 
                 if (rideRequest.Status == RideRequestStatus.Unpaid)
                 {

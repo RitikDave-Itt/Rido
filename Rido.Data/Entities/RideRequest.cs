@@ -16,6 +16,8 @@ namespace Rido.Data.Entities
         public DateTime PickupTime { get; set; }
         public DateTime DropoffTime { get; set; }
 
+        public bool IsActive { get; set; } = true;
+
 
 
         public string DestinationLatitude { get; set; }

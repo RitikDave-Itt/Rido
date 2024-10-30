@@ -33,7 +33,7 @@ namespace Rido.Data.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     FirstName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LastName = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    Email = table.Column<string>(type: "nvarchar(250)", maxLength: 250, nullable: false),
                     PhoneNumber = table.Column<string>(type: "nvarchar(15)", maxLength: 15, nullable: false),
                     Gender = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
@@ -124,42 +124,6 @@ namespace Rido.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RideRequests",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DriverId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    PickupLatitude = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PickupLongitude = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PickupAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PickupTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DestinationLatitude = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DestinationLongitude = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    DestinationAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MinPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    MaxPrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    VehicleType = table.Column<int>(type: "int", nullable: false),
-                    GeohashCode = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    DistanceInKm = table.Column<double>(type: "float", nullable: false),
-                    Status = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RideRequests", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RideRequests_Users_DriverId",
-                        column: x => x.DriverId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_RideRequests_Users_UserId",
-                        column: x => x.UserId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
                 name: "RideTransactions",
                 columns: table => new
                 {
@@ -234,44 +198,47 @@ namespace Rido.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "RideBookings",
+                name: "RideRequests",
                 columns: table => new
                 {
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    RiderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     DriverId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    PickupTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DropoffTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     PickupLatitude = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PickupLongitude = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PickupAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PickupTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    DropoffTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DestinationLatitude = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DestinationLongitude = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DestinationAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    GeohashCode = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    TransactionId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    CancelBy = table.Column<int>(type: "int", nullable: true),
+                    CancelReason = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     VehicleType = table.Column<int>(type: "int", nullable: false),
                     DistanceInKm = table.Column<double>(type: "float", nullable: false),
-                    GeohashCode = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TransactionId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    Amount = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()"),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: false, defaultValueSql: "GETDATE()")
+                    Status = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RideBookings", x => x.Id);
+                    table.PrimaryKey("PK_RideRequests", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RideBookings_RideTransactions_TransactionId",
+                        name: "FK_RideRequests_RideTransactions_TransactionId",
                         column: x => x.TransactionId,
                         principalTable: "RideTransactions",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_RideBookings_Users_DriverId",
+                        name: "FK_RideRequests_Users_DriverId",
                         column: x => x.DriverId,
                         principalTable: "Users",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_RideBookings_Users_UserId",
-                        column: x => x.UserId,
+                        name: "FK_RideRequests_Users_RiderId",
+                        column: x => x.RiderId,
                         principalTable: "Users",
                         principalColumn: "Id");
                 });
@@ -283,7 +250,7 @@ namespace Rido.Data.Migrations
                     Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     DriverId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    BookingId = table.Column<string>(type: "nvarchar(450)", nullable: true),
+                    RideRequestId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Rating = table.Column<decimal>(type: "decimal(2,1)", nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -292,9 +259,9 @@ namespace Rido.Data.Migrations
                 {
                     table.PrimaryKey("PK_RideReview", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_RideReview_RideBookings_BookingId",
-                        column: x => x.BookingId,
-                        principalTable: "RideBookings",
+                        name: "FK_RideReview_RideRequests_RideRequestId",
+                        column: x => x.RideRequestId,
+                        principalTable: "RideRequests",
                         principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_RideReview_Users_DriverId",
@@ -343,39 +310,19 @@ namespace Rido.Data.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_RideBookings_DriverId",
-                table: "RideBookings",
+                name: "IX_RideRequests_DriverId",
+                table: "RideRequests",
                 column: "DriverId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RideBookings_TransactionId",
-                table: "RideBookings",
-                column: "TransactionId",
-                unique: true,
-                filter: "[TransactionId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RideBookings_UserId",
-                table: "RideBookings",
-                column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RideRequests_DriverId",
+                name: "IX_RideRequests_RiderId",
                 table: "RideRequests",
-                column: "DriverId",
-                unique: true,
-                filter: "[DriverId] IS NOT NULL");
+                column: "RiderId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RideRequests_GeohashCode",
+                name: "IX_RideRequests_TransactionId",
                 table: "RideRequests",
-                column: "GeohashCode");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RideRequests_UserId",
-                table: "RideRequests",
-                column: "UserId",
-                unique: true);
+                column: "TransactionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RideRequests_VehicleType",
@@ -383,16 +330,16 @@ namespace Rido.Data.Migrations
                 column: "VehicleType");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RideReview_BookingId",
-                table: "RideReview",
-                column: "BookingId",
-                unique: true,
-                filter: "[BookingId] IS NOT NULL");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RideReview_DriverId",
                 table: "RideReview",
                 column: "DriverId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RideReview_RideRequestId",
+                table: "RideReview",
+                column: "RideRequestId",
+                unique: true,
+                filter: "[RideRequestId] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RideReview_UserId",
@@ -453,9 +400,6 @@ namespace Rido.Data.Migrations
                 name: "RefreshTokens");
 
             migrationBuilder.DropTable(
-                name: "RideRequests");
-
-            migrationBuilder.DropTable(
                 name: "RideReview");
 
             migrationBuilder.DropTable(
@@ -465,7 +409,7 @@ namespace Rido.Data.Migrations
                 name: "WalletTransactions");
 
             migrationBuilder.DropTable(
-                name: "RideBookings");
+                name: "RideRequests");
 
             migrationBuilder.DropTable(
                 name: "RideTransactions");

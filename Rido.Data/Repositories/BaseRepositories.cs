@@ -95,7 +95,15 @@ namespace Rido.Data.Repositories
 
             return (items, totalCount);
         }
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> predicate)
+        {
+            return await _context.Set<T>().AnyAsync(predicate);
+        }
 
+        public async Task<int> CountAsync(Expression<Func<T, bool>> predicate = null)
+        {
+            return predicate == null ? await _context.Set<T>().CountAsync() : await _context.Set<T>().CountAsync(predicate);
+        }
 
         private IQueryable<T> ApplyIncludes(IQueryable<T> query, params Expression<Func<T, object>>[] includes)
         {

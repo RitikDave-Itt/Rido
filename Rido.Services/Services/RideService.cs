@@ -34,16 +34,10 @@ namespace Rido.Services
         {
             string currentUserId = GetCurrentUserId();
 
-            
 
-            var checkRide = _repository.FindAsync(ride => ride.RiderId == currentUserId||
-            ride.Status==RideRequestStatus.Requested||
-            ride.Status==RideRequestStatus.Accepted||
-            ride.Status==RideRequestStatus.InProgress||
-            ride.Status==RideRequestStatus.Unpaid
 
-            );
-            if (checkRide.Result != null)
+            var checkRide = await _repository.AnyAsync(ride =>ride.RiderId == currentUserId && ride.IsActive==true);
+            if (checkRide)
             {
                 throw new ALreadyRideExistsException();
             }
@@ -114,6 +108,7 @@ namespace Rido.Services
             IEnumerable<RideRequest> createdRideRequest = await _repository.FindAllAsync(item => 
             item.GeohashCode == geohash
             && item.Status == RideRequestStatus.Requested
+            &&item.IsActive == true
             &&item.VehicleType==user.DriverData.VehicleType,item=>item.Rider);
 
 
@@ -122,34 +117,34 @@ namespace Rido.Services
 
         }
 
-        public async Task<bool> CancelRideByUser(string RideRequestId)
+        public async Task<bool> CancelRideByUser()
         {
 
             string currentUserId = GetCurrentUserId();
 
-            var rideRequest = await _repository.GetByIdAsync(RideRequestId);
+            var rideRequest = await _repository.FindAsync(rr=>rr.RiderId==currentUserId&&rr.IsActive);
 
             if (rideRequest == null)
             {
                 return false;
             }
 
+
             rideRequest.Status= RideRequestStatus.Canceled;
+            rideRequest.IsActive = false;
             rideRequest.CancelBy = UserRole.User;
             var update = await _repository.UpdateAsync(rideRequest);
-
-
-
 
 
             return update;
         }
 
-        public async Task<bool> CancelRideByDriver(string rideRequestId)
+        public async Task<bool> CancelRideByDriver()
         {
 
+            var userId = GetCurrentUserId();
 
-            var rideRequest = await _repository.GetByIdAsync(rideRequestId);
+            var rideRequest = await _repository.FindAsync(rr=>rr.DriverId==userId&&rr.IsActive);
 
             if (rideRequest == null)
             {
@@ -157,6 +152,7 @@ namespace Rido.Services
             }
            
             rideRequest.Status = RideRequestStatus.Canceled;
+            rideRequest.IsActive= false;
             rideRequest.CancelBy= UserRole.Driver;
 
             bool result = await _repository.UpdateAsync(rideRequest);
@@ -172,14 +168,9 @@ namespace Rido.Services
 
 
 
-            var checkRide =await  _repository.FindAsync(ride => ride.RiderId == currentUserId ||
-            ride.Status == RideRequestStatus.Requested ||
-            ride.Status == RideRequestStatus.Accepted ||
-            ride.Status == RideRequestStatus.InProgress ||
-            ride.Status == RideRequestStatus.Unpaid
-
-            );
-            if (checkRide!=null)
+            var checkRide = await _repository.AnyAsync(ride =>ride.DriverId== currentUserId&&ride.IsActive==true);
+    
+            if (checkRide)
             {
                 throw new ALreadyRideExistsException();
             }
@@ -265,7 +256,32 @@ namespace Rido.Services
             return OTPVerificationStatus.Success;
         }
 
-       
+        public async Task<string> GetActiveRideStatusAsync()
+        {
+            var userId = GetCurrentUserId();
+            var role = GetCurrentUserRole();
+            if (role == UserRole.User.ToString())
+            {
+                var activeRide = await _repository.FindAsync(ride => ride.RiderId == userId && ride.IsActive);
+                   
+                return activeRide?.Status.ToString();
+
+            }
+            else if( role == UserRole.Driver.ToString())
+            {
+                var activeRide = await _repository.FindAsync(ride =>
+                    ride.DriverId == userId &&ride.IsActive
+                   
+                );
+                return activeRide?.Status.ToString();
+
+
+            }
+            return null;
+
+        }
+
+
 
 
     }

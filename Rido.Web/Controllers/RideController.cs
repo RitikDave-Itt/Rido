@@ -114,12 +114,12 @@ namespace Rido.Web.Controllers
 
 
 
-        [HttpDelete("cancel-by-user/{rideRequestId}")]
-        public async Task<IActionResult> CancelRideByUser(string rideRequestId)
+        [HttpPut("cancel-by-rider")]
+        public async Task<IActionResult> CancelRideByUser()
         {
             try
             {
-                var result = await _rideService.CancelRideByUser(rideRequestId);
+                var result = await _rideService.CancelRideByUser();
                 if (result)
                 {
                     return Ok(new { Success = true });
@@ -132,12 +132,12 @@ namespace Rido.Web.Controllers
                 return StatusCode(500, "Internal server error.");
             }
         }
-        [HttpPut("driver-cancel-ride/{rideRequestId}")]
-        public async Task<IActionResult> CancelRideByDriver(string rideRequestId)
+        [HttpPut("cancel-by-driver")]
+        public async Task<IActionResult> CancelRideByDriver()
         {
             try
             {
-                var result = await _rideService.CancelRideByDriver(rideRequestId);
+                var result = await _rideService.CancelRideByDriver();
                 if (result)
                 {
                     return Ok(new { success = true, Message = "Ride Cancelled Successfully" });
@@ -218,7 +218,7 @@ namespace Rido.Web.Controllers
             var userId = GetCurrentUserId();
 
 
-            var rideRequest = await _rideService.FindAsync(ride => ride.DriverId == userId, ride => ride.Rider);
+            var rideRequest = await _rideService.FindAsync(ride => ride.DriverId == userId&&ride.IsActive, ride => ride.Rider);
 
             if (rideRequest == null)
             {
@@ -264,7 +264,7 @@ namespace Rido.Web.Controllers
             var userId = GetCurrentUserId();
 
 
-            var rideRequest = await _rideService.FindAsync(ride => ride.RiderId == userId, ride => ride.Driver, ride => ride.Driver.location);
+            var rideRequest = await _rideService.FindAsync(ride => ride.RiderId == userId&&ride.IsActive, ride => ride.Driver, ride => ride.Driver.location);
 
             if (rideRequest == null)
             {
@@ -306,7 +306,7 @@ namespace Rido.Web.Controllers
                             driverName = $"{rideRequest?.Driver.FirstName} {rideRequest?.Driver.LastName}",
 
                             mobileNo = rideRequest.Driver.PhoneNumber,
-                            vehicleType = rideRequest.VehicleType,
+                            vehicleType = rideRequest.VehicleType.ToString(),
                             latitude = rideRequest.Driver?.location?.Latitude,
                             longitude = rideRequest.Driver?.location?.Longitude,
                             otp = OtpUtils.GenerateOtp(rideRequest.Id)
@@ -324,28 +324,16 @@ namespace Rido.Web.Controllers
         {
             try
             {
-                var userID = GetCurrentUserId();
-                var Role = GetCurrentUserRole();
-                if (Role == UserRole.User.ToString())
+                var status = await _rideService.GetActiveRideStatusAsync();
+                if (status == null)
                 {
-                    var rideRequest = await _rideService.FindAsync(ride => ride.RiderId == userID);
-                    if (rideRequest != null)
-                    {
-                        return Ok(rideRequest.Status.ToString());
-                    }
-                    return NotFound();
-                }else if(Role == UserRole.Driver.ToString())
-                {
-                    var rideRequest = await _rideService.FindAsync(ride => ride.DriverId == userID);
-                    if (rideRequest != null)
-                    {
-                        return Ok(rideRequest.Status.ToString());
-                    }
-                    return NotFound();
-
+                return NotFound();
 
                 }
-                return NotFound();
+                else
+                {
+                    return Ok(status);
+                }
 
             }
             catch (Exception ex)
@@ -365,14 +353,14 @@ namespace Rido.Web.Controllers
 
                 var userId = GetCurrentUserId();
 
-                var rideRequest = await _rideService.FindAsync(ride => ride.DriverId == userId);
+                var rideRequest = await _rideService.FindAsync(ride => ride.DriverId == userId && ride.IsActive);
 
                 if (rideRequest == null)
                 {
                     return NotFound("Ride request not found");
                 }
 
-                rideRequest.Status = RideRequestStatus.Completed;
+                rideRequest.Status = RideRequestStatus.Unpaid;
                 var updateStatus = await _rideService.UpdateAsync(rideRequest);
 
                 if (!updateStatus)

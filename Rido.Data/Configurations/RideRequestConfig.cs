@@ -34,6 +34,12 @@ namespace Rido.Data.Configurations
             builder.Property(rr => rr.PickupLongitude)
                    .IsRequired();
 
+            builder.HasIndex(rr => rr.IsActive);
+
+            builder.Property(rr => rr.IsActive)
+                .IsRequired();
+                
+
             builder.Property(rr => rr.PickupAddress)
                    .IsRequired();
 

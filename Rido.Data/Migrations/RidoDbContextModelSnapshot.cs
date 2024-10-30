@@ -167,7 +167,7 @@ namespace Rido.Data.Migrations
                     b.ToTable("RefreshTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Rido.Data.Entities.RideBooking", b =>
+            modelBuilder.Entity("Rido.Data.Entities.RideRequest", b =>
                 {
                     b.Property<string>("Id")
                         .HasColumnType("nvarchar(450)");
@@ -175,10 +175,14 @@ namespace Rido.Data.Migrations
                     b.Property<decimal>("Amount")
                         .HasColumnType("decimal(18,2)");
 
+                    b.Property<int?>("CancelBy")
+                        .HasColumnType("int");
+
+                    b.Property<string>("CancelReason")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("DestinationAddress")
                         .IsRequired()
@@ -202,7 +206,11 @@ namespace Rido.Data.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("GeohashCode")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
 
                     b.Property<string>("PickupAddress")
                         .IsRequired()
@@ -219,16 +227,17 @@ namespace Rido.Data.Migrations
                     b.Property<DateTime>("PickupTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("RiderId")
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("int");
+
                     b.Property<string>("TransactionId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .ValueGeneratedOnUpdate()
-                        .HasColumnType("datetime2")
-                        .HasDefaultValueSql("GETDATE()");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                        .HasColumnType("datetime2");
 
                     b.Property<int>("VehicleType")
                         .HasColumnType("int");
@@ -237,83 +246,11 @@ namespace Rido.Data.Migrations
 
                     b.HasIndex("DriverId");
 
-                    b.HasIndex("TransactionId")
-                        .IsUnique()
-                        .HasFilter("[TransactionId] IS NOT NULL");
+                    b.HasIndex("IsActive");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("RiderId");
 
-                    b.ToTable("RideBookings");
-                });
-
-            modelBuilder.Entity("Rido.Data.Entities.RideRequest", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("DestinationAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DestinationLatitude")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("DestinationLongitude")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("DistanceInKm")
-                        .HasColumnType("float");
-
-                    b.Property<string>("DriverId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("GeohashCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<decimal>("MaxPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("MinPrice")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("PickupAddress")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PickupLatitude")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("PickupLongitude")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("PickupTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("VehicleType")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DriverId")
-                        .IsUnique()
-                        .HasFilter("[DriverId] IS NOT NULL");
-
-                    b.HasIndex("GeohashCode");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
+                    b.HasIndex("TransactionId");
 
                     b.HasIndex("VehicleType");
 
@@ -323,9 +260,6 @@ namespace Rido.Data.Migrations
             modelBuilder.Entity("Rido.Data.Entities.RideReview", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("BookingId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Comment")
@@ -340,16 +274,19 @@ namespace Rido.Data.Migrations
                     b.Property<decimal>("Rating")
                         .HasColumnType("decimal(2,1)");
 
+                    b.Property<string>("RideRequestId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("BookingId")
-                        .IsUnique()
-                        .HasFilter("[BookingId] IS NOT NULL");
-
                     b.HasIndex("DriverId");
+
+                    b.HasIndex("RideRequestId")
+                        .IsUnique()
+                        .HasFilter("[RideRequestId] IS NOT NULL");
 
                     b.HasIndex("UserId");
 
@@ -375,10 +312,6 @@ namespace Rido.Data.Migrations
                     b.Property<string>("Remarks")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RideRequestId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("Status")
                         .HasColumnType("int");
 
@@ -388,9 +321,6 @@ namespace Rido.Data.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("DriverId");
-
-                    b.HasIndex("RideRequestId")
-                        .IsUnique();
 
                     b.HasIndex("UserId");
 
@@ -565,58 +495,40 @@ namespace Rido.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Rido.Data.Entities.RideBooking", b =>
+            modelBuilder.Entity("Rido.Data.Entities.RideRequest", b =>
                 {
                     b.HasOne("Rido.Data.Entities.User", "Driver")
                         .WithMany()
                         .HasForeignKey("DriverId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Rido.Data.Entities.RideTransaction", "RideTransaction")
-                        .WithOne()
-                        .HasForeignKey("Rido.Data.Entities.RideBooking", "TransactionId")
+                    b.HasOne("Rido.Data.Entities.User", "Rider")
+                        .WithMany()
+                        .HasForeignKey("RiderId")
                         .OnDelete(DeleteBehavior.NoAction);
 
-                    b.HasOne("Rido.Data.Entities.User", "User")
+                    b.HasOne("Rido.Data.Entities.RideTransaction", "RideTransaction")
                         .WithMany()
-                        .HasForeignKey("UserId")
+                        .HasForeignKey("TransactionId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.Navigation("Driver");
 
                     b.Navigation("RideTransaction");
 
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Rido.Data.Entities.RideRequest", b =>
-                {
-                    b.HasOne("Rido.Data.Entities.User", "Driver")
-                        .WithOne()
-                        .HasForeignKey("Rido.Data.Entities.RideRequest", "DriverId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
-                    b.HasOne("Rido.Data.Entities.User", "Rider")
-                        .WithOne("RideRequest")
-                        .HasForeignKey("Rido.Data.Entities.RideRequest", "UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Driver");
-
                     b.Navigation("Rider");
                 });
 
             modelBuilder.Entity("Rido.Data.Entities.RideReview", b =>
                 {
-                    b.HasOne("Rido.Data.Entities.RideBooking", "Booking")
-                        .WithOne()
-                        .HasForeignKey("Rido.Data.Entities.RideReview", "BookingId")
-                        .OnDelete(DeleteBehavior.NoAction);
-
                     b.HasOne("Rido.Data.Entities.User", "Driver")
                         .WithMany()
                         .HasForeignKey("DriverId")
+                        .OnDelete(DeleteBehavior.NoAction);
+
+                    b.HasOne("Rido.Data.Entities.RideRequest", "Booking")
+                        .WithOne()
+                        .HasForeignKey("Rido.Data.Entities.RideReview", "RideRequestId")
                         .OnDelete(DeleteBehavior.NoAction);
 
                     b.HasOne("Rido.Data.Entities.User", "User")
@@ -681,8 +593,6 @@ namespace Rido.Data.Migrations
             modelBuilder.Entity("Rido.Data.Entities.User", b =>
                 {
                     b.Navigation("DriverData");
-
-                    b.Navigation("RideRequest");
 
                     b.Navigation("Wallet")
                         .IsRequired();

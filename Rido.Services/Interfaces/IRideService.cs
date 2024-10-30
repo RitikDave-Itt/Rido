@@ -17,13 +17,15 @@ namespace Rido.Services.Interfaces
 
         Task<List<RideRequestResponseDto>> GetRideRequestList(LocationType location);
 
-        Task<bool> CancelRideByUser(string rideRequestId);
+        Task<bool> CancelRideByUser();
 
-        Task<bool> CancelRideByDriver(string rideRequestId);
+        Task<bool> CancelRideByDriver();
 
         Task<RideRequest> AssignRideDriver(string rideRequestId);
         Task<dynamic> GetRideAndDriverDetail(string rideRequestId);
         Task<OTPVerificationStatus> VerifyOTP(string otp, string rideRequestId);
+        Task<string> GetActiveRideStatusAsync();
+
 
 
     }

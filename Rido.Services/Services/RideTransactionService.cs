@@ -49,6 +49,7 @@ namespace Rido.Services
             };
             rideRequest.Status = RideRequestStatus.Completed;
             rideRequest.RideTransaction = transaction;
+            rideRequest.IsActive = false;
 
          
 
