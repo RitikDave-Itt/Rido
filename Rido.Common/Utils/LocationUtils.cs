@@ -26,7 +26,7 @@ namespace Rido.Services
             var client = _httpClientFactory.CreateClient("location");
 
 
-            string requestUri = $"autocomplete?key={_key}&q={Uri.EscapeDataString(requestDto.Destination)},{requestDto.City},{requestDto.County},{requestDto.State},{requestDto.Postcode},{requestDto.County},{requestDto.Country_code}";
+            string requestUri = $"autocomplete?key={_key}&q={Uri.EscapeDataString(requestDto.Destination)},{requestDto.City},{requestDto.County},{requestDto.State},{requestDto.County},{requestDto.Country_code}";
 
             HttpResponseMessage response = await client.GetAsync(requestUri);
             response.EnsureSuccessStatusCode();

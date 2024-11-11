@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Rido.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class UpdateDb : Migration
+    public partial class UpdatedDb : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -209,6 +209,7 @@ namespace Rido.Data.Migrations
                     PickupAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     PickupTime = table.Column<DateTime>(type: "datetime2", nullable: false),
                     DropoffTime = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    IsActive = table.Column<bool>(type: "bit", nullable: false),
                     DestinationLatitude = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DestinationLongitude = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DestinationAddress = table.Column<string>(type: "nvarchar(max)", nullable: false),
@@ -253,7 +254,8 @@ namespace Rido.Data.Migrations
                     RideRequestId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Rating = table.Column<decimal>(type: "decimal(2,1)", nullable: false),
                     Comment = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RideRequestId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -261,6 +263,11 @@ namespace Rido.Data.Migrations
                     table.ForeignKey(
                         name: "FK_RideReview_RideRequests_RideRequestId",
                         column: x => x.RideRequestId,
+                        principalTable: "RideRequests",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_RideReview_RideRequests_RideRequestId1",
+                        column: x => x.RideRequestId1,
                         principalTable: "RideRequests",
                         principalColumn: "Id");
                     table.ForeignKey(
@@ -315,6 +322,11 @@ namespace Rido.Data.Migrations
                 column: "DriverId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RideRequests_IsActive",
+                table: "RideRequests",
+                column: "IsActive");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RideRequests_RiderId",
                 table: "RideRequests",
                 column: "RiderId");
@@ -340,6 +352,13 @@ namespace Rido.Data.Migrations
                 column: "RideRequestId",
                 unique: true,
                 filter: "[RideRequestId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RideReview_RideRequestId1",
+                table: "RideReview",
+                column: "RideRequestId1",
+                unique: true,
+                filter: "[RideRequestId1] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RideReview_UserId",

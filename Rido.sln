@@ -11,11 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rido.Services", "Rido.Servi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rido.Common", "Rido.Common\Rido.Common.csproj", "{8A1369C5-6FC4-41D3-824B-28E2233421BB}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rido.Infrastructure", "Rido.Infrastructure\Rido.Infrastructure.csproj", "{A9E0C114-9A1B-48B4-929E-090A9AB401C9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rido.Test", "Rido.Test\Rido.Test.csproj", "{A241F59E-F3FA-4C36-8241-EF87DFF30A58}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rido.Test", "Rido.Test\Rido.Test.csproj", "{A241F59E-F3FA-4C36-8241-EF87DFF30A58}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rido.Model", "Rido.Model\Rido.Model.csproj", "{54167FAF-03C0-4A04-B640-48DD3350A69E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Rido.Model", "Rido.Model\Rido.Model.csproj", "{54167FAF-03C0-4A04-B640-48DD3350A69E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,10 +37,6 @@ Global
 		{8A1369C5-6FC4-41D3-824B-28E2233421BB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8A1369C5-6FC4-41D3-824B-28E2233421BB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8A1369C5-6FC4-41D3-824B-28E2233421BB}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A9E0C114-9A1B-48B4-929E-090A9AB401C9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A9E0C114-9A1B-48B4-929E-090A9AB401C9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A9E0C114-9A1B-48B4-929E-090A9AB401C9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A9E0C114-9A1B-48B4-929E-090A9AB401C9}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A241F59E-F3FA-4C36-8241-EF87DFF30A58}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{A241F59E-F3FA-4C36-8241-EF87DFF30A58}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A241F59E-F3FA-4C36-8241-EF87DFF30A58}.Release|Any CPU.ActiveCfg = Release|Any CPU

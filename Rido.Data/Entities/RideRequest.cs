@@ -24,6 +24,8 @@ namespace Rido.Data.Entities
         public string DestinationLongitude { get; set; }
         public string DestinationAddress { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+        //public DateTime Timeout => CreatedAt.AddMinutes(2);
+
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         public string GeohashCode { get; set; }
@@ -34,6 +36,8 @@ namespace Rido.Data.Entities
         public UserRole? CancelBy { get; set; }
         public string? CancelReason { get; set; }
 
+        
+
 
 
         public VehicleType VehicleType { get; set; }
@@ -43,12 +47,7 @@ namespace Rido.Data.Entities
         public User? Rider { get; set; }
         public User? Driver { get; set; }
         public RideTransaction? RideTransaction { get; set; }
-
-
-
-
-
-
+        public RideReview? RideReview { get; set; }
 
     }
 }

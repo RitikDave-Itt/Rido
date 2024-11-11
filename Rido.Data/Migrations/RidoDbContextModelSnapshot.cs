@@ -277,6 +277,9 @@ namespace Rido.Data.Migrations
                     b.Property<string>("RideRequestId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("RideRequestId1")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<string>("UserId")
                         .HasColumnType("nvarchar(450)");
 
@@ -287,6 +290,10 @@ namespace Rido.Data.Migrations
                     b.HasIndex("RideRequestId")
                         .IsUnique()
                         .HasFilter("[RideRequestId] IS NOT NULL");
+
+                    b.HasIndex("RideRequestId1")
+                        .IsUnique()
+                        .HasFilter("[RideRequestId1] IS NOT NULL");
 
                     b.HasIndex("UserId");
 
@@ -531,6 +538,10 @@ namespace Rido.Data.Migrations
                         .HasForeignKey("Rido.Data.Entities.RideReview", "RideRequestId")
                         .OnDelete(DeleteBehavior.NoAction);
 
+                    b.HasOne("Rido.Data.Entities.RideRequest", null)
+                        .WithOne("RideReview")
+                        .HasForeignKey("Rido.Data.Entities.RideReview", "RideRequestId1");
+
                     b.HasOne("Rido.Data.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
@@ -588,6 +599,11 @@ namespace Rido.Data.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Rido.Data.Entities.RideRequest", b =>
+                {
+                    b.Navigation("RideReview");
                 });
 
             modelBuilder.Entity("Rido.Data.Entities.User", b =>

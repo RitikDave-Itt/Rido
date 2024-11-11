@@ -67,5 +67,40 @@ namespace Rido.Web.Controllers
                 return StatusCode(500, new { Message = "Internal server error." });
             }
         }
+
+        [HttpGet("all-by-user")]
+
+        public async Task<IActionResult> GetAllWalletTransactionByUser([FromQuery] int pageNo, [FromQuery] int pageSize = 10)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+
+                var (transactions, count) = await _walletTransactionService.FindPageAsync(
+                    wt => wt.UserId == userId,
+                    pageSize: pageSize,
+                    pageNo: pageNo,
+                    [query => query.OrderByDescending(item => item.CreatedAt)]
+                );
+
+                var transactionList = transactions.Select(wt => new
+                {
+
+                    amount = wt.Amount,
+                    type = wt.Type.ToString(),
+                    status = wt.Status.ToString(),
+                    createdAt = wt.CreatedAt,
+                    id = wt.Id
+                }).ToList();
+
+                return Ok(new { data = transactionList, totalItem = count });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "EXCEPTION IN WALLET TRANSACTION");
+                return BadRequest();
+            }
+        }
+
     }
 }

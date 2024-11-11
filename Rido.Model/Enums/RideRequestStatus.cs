@@ -14,6 +14,7 @@ namespace Rido.Model.Enums
         Unpaid,
         Completed,            
         Canceled,                  
-        Failed                  
+        Failed,
+        Timeout
     }
 }

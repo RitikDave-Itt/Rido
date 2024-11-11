@@ -84,7 +84,11 @@ namespace Rido.Web.Controllers
                 var userId = GetCurrentUserId();
                 var userRole = GetCurrentUserRole();
 
-                var rideRequest = await _rideBookingService.FindAsync(rr => rr.Id == rideRequestId, rr => rr.Driver, rr => rr.Rider);
+                var rideRequest = await _rideBookingService.FindAsync(rr => rr.Id == rideRequestId
+                ,rr => rr.Driver
+                ,rr => rr.Rider
+                ,rr => rr.RideReview
+                );
 
                 if(rideRequest == null)
                 {
@@ -113,7 +117,6 @@ namespace Rido.Web.Controllers
                     updatedAt = rideRequest.UpdatedAt,
                     cancelBy = rideRequest.CancelBy.ToString(),
                     cancelReason = rideRequest.CancelReason,
-
                 };
 
 
@@ -122,12 +125,18 @@ namespace Rido.Web.Controllers
                     return Ok(new
                     {
                         bookingData = rideRequestData,
-                        driver = rideRequest.Driver != null ? new
+                        user = rideRequest.Driver != null ? new
                         {
                             name = $"{rideRequest.Driver.FirstName} {rideRequest.Driver.LastName}"
                         } : null,
+                        review = new
+                        {
+                            rating = rideRequest?.RideReview?.Rating ?? 0,      
+                            comment = rideRequest?.RideReview?.Comment ?? "No comments"     
+                        }
 
-                        
+
+
                     });
 
                 }
@@ -136,11 +145,15 @@ namespace Rido.Web.Controllers
                     return Ok(new
                     {
                         bookingData = rideRequestData,
-                        rider = rideRequest.Rider != null ? new
+                        user = rideRequest.Rider != null ? new
                         {
                             name = $"{rideRequest.Rider.FirstName} {rideRequest.Rider.LastName}"
                         } : null,
-
+                        review = new
+                        {
+                            rating = rideRequest?.RideReview?.Rating ?? 0,
+                            comment = rideRequest?.RideReview?.Comment ?? "No comments"
+                        }
 
                     });
 

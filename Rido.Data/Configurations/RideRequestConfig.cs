@@ -22,6 +22,7 @@ namespace Rido.Data.Configurations
 
             builder.HasIndex(rr => rr.RiderId);
 
+
             builder.Property(rr => rr.DriverId)
                 .IsRequired(false);
 
@@ -82,6 +83,11 @@ namespace Rido.Data.Configurations
                 .WithMany()
                 .HasForeignKey(rr => rr.RiderId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            builder.HasOne(rr => rr.RideReview)
+                .WithOne()
+                .HasForeignKey<RideReview>(rr => rr.RideRequestId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(rr=>rr.Driver)
                 .WithMany()
