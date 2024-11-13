@@ -95,6 +95,7 @@ namespace Rido.Web.Controllers
                 return StatusCode(500, new { Message = "An error occurred while  your request." });
             }
         }
+
         [Authorize(Roles = "Driver")]
         [HttpGet("get-ride-list")]
         public async Task<IActionResult> GetRideRequestByLocation([FromQuery] string latitude, string longitude)

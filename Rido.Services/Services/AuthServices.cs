@@ -104,7 +104,8 @@ namespace Rido.Services
                 User = new
                 {
 
-                    Name = $"{user?.LastName} {user?.LastName}",
+                    firstName = user?.LastName,
+                    lastName= user?.LastName,
                     email = user?.Email,
                     Role = user?.Role.ToString(),
                     profileImage = user?.ProfileImage?.Base64String,

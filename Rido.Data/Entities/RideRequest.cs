@@ -24,7 +24,6 @@ namespace Rido.Data.Entities
         public string DestinationLongitude { get; set; }
         public string DestinationAddress { get; set; }
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
-        //public DateTime Timeout => CreatedAt.AddMinutes(2);
 
 
         public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
