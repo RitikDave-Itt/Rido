@@ -1,6 +1,7 @@
 using Rido.Common;
 using Rido.Data;
 using Rido.Services;
+using Rido.Services.Services;
 
 namespace Rido.Web
 {
@@ -25,6 +26,9 @@ namespace Rido.Web
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
 
+            builder.Services.AddSignalR();
+
+
             var app = builder.Build();
 
 
@@ -34,6 +38,9 @@ namespace Rido.Web
                 app.UseSwaggerUI();
 
             }
+            app.MapHub<ChatHub>("/chathub");
+
+
             app.UseCors("AllowOrigins");
             app.UseHttpsRedirection();
             app.UseAuthentication();

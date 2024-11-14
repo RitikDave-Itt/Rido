@@ -25,6 +25,9 @@ namespace Rido.Services
             services.AddScoped<IWalletTransactionService, WalletTransactionService>();
             services.AddScoped<IUserService, UserService>();
 
+
+            
+
         }
     }
 }
