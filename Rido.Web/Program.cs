@@ -1,7 +1,7 @@
 using Rido.Common;
 using Rido.Data;
 using Rido.Services;
-using Rido.Services.Services;
+using Rido.Web.Hubs;
 
 namespace Rido.Web
 {
@@ -23,6 +23,10 @@ namespace Rido.Web
             builder.Services.AddControllers();
             builder.Services.SetupCors();
 
+            //builder.Services.AddSingleton<ILogger<T>, Logger<T>>();
+            builder.Services.AddLogging();
+
+
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
 
@@ -38,7 +42,6 @@ namespace Rido.Web
                 app.UseSwaggerUI();
 
             }
-            app.MapHub<ChatHub>("/chathub");
 
 
             app.UseCors("AllowOrigins");
@@ -46,6 +49,7 @@ namespace Rido.Web
             app.UseAuthentication();
             app.UseAuthorization();
 
+            app.MapHub<ChatHub>("/chat");
             app.MapControllers();
 
             app.Run();

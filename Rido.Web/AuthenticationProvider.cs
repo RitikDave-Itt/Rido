@@ -9,7 +9,7 @@ public static class AuthenticationProvider
     public static void ConfigureAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<JwtSettings>(configuration.GetSection("JwtSettings"));
-        services.AddScoped<JwtUtil>();     
+        services.AddSingleton<JwtUtil>();     
 
         var jwtSettings = configuration.GetSection("JwtSettings").Get<JwtSettings>();
         var key = Encoding.UTF8.GetBytes(jwtSettings.Secret);
