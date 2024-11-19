@@ -22,6 +22,7 @@ namespace Rido.Web
             builder.Services.AddControllers();
             builder.Services.SetupCors();
 
+
             builder.Logging.AddConsole();
             builder.Logging.AddDebug();
 

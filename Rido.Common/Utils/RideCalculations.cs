@@ -46,7 +46,7 @@ namespace Rido.Common.Utils
 
 
             double ratePerKm = GetRatePerKm(vehicle);
-            return [distanceInKm * ratePerKm , distanceInKm*ratePerKm+15];
+            return [distanceInKm * ratePerKm , distanceInKm*ratePerKm];
         }
 
         public FareListResponseDto FareList(LocationType pickup, LocationType destination)

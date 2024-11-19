@@ -65,9 +65,6 @@ namespace Rido.Services
 
             return new ReverseGeocodeResponseDto { DisplayName = locationData["display_name"]?.ToString(), Address = AddressObj };
 
-
-
-
         }
 
 
